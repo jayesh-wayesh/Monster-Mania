@@ -1,0 +1,131 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.Container {
+  /* background-image: linear-gradient(to right, #40E0D0, #FF8C00,#FF0080) ; */
+  background-color: #000;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+h1{
+  font-size: 72px;
+  background: -webkit-linear-gradient(left, #060135, #7303c0,#ec38bc, #fdeff9);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+span{
+  display: inline;
+  background: -webkit-linear-gradient(left, #0d0366, #7303c0,#ec38bc, #fdeff9);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+section{
+  height: auto;
+  min-height: 400px;
+  background-color: white;
+  padding-bottom: 2%;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  color: #000;
+}
+
+.section-dark{
+  height: auto;
+  background-color: #000;
+  padding-bottom: 2%;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  color: #fff;
+}
+
+
+.section-nft-drop{
+  height: auto;
+  background-image: linear-gradient(to right, #0d0366, #7303c0,#ec38bc, #fdeff9);
+  padding-bottom: 2%;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  color: #fff;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+section .container {
+  max-width: 80%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  text-align: center;
+  justify-content: flex-start;
+  align-items:baseline;
+  align-self: center;
+  overflow: auto;
+}
+
+.container-desc {
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  max-width: 70%;
+  align-content: flex-start;
+}
+
+.container-game{
+  display: flex; /* or inline-flex */
+  flex-wrap: nowrap;
+  align-items:baseline;
+  justify-content: flex-end;
+}
+
+.media {
+  height: 200;
+  width: 200;
+  align-self: 'center';
+  padding-top: '20%';
+  padding-bottom: '5%';
+}
+
+.media_locked {
+  opacity: 0.2;
+  color: '#0025FF';
+  /* paddingTop: '50%', */
+}
+
+p{
+  font-size: 20px;
+}
