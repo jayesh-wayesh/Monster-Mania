@@ -4,16 +4,6 @@ let User = require('../models/user.model');
 
 
 /**
- *    Assumptions :
- * 
- *    @param sender_account_id: username
- *    @param recipient_account_id: username 
- *    not considering old editions
- *
- * 
- */
-
-/**
  *   Doubts:
  * 
  *   @param content: What exactly is this ?
@@ -50,7 +40,7 @@ router.route('/create').post(async (req,res) => {
      * 
      */
     
-    // not considering old editions
+    // Temporary workaround to create NFTs 
     var editions = req.body.editions
     console.log('editions')
     console.log(req.body.editions)

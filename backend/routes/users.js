@@ -28,7 +28,7 @@ router.route('/:username').get((req, res) => {
 router.route('/add').post((req, res) => {
 
     /**
-     *   NFT retrieval api
+     *   Account creation api
      * 
      *    @param developer_id: ENV_VARIABLE_DEVELOPER_ID
      *    @param account_id: req.body.username
