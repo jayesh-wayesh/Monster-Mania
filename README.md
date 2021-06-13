@@ -7,6 +7,6 @@
 
 #### Backend
 
-1. npm i
-2. cd backend
+1. cd backend
+2. yarn
 3. nodemon server
