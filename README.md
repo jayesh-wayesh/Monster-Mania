@@ -1,5 +1,9 @@
 # Monster_Mania
 
+Demo app for SaaS api project (WIP)
+
+## Steps to run it locally
+
 #### Frontend
 
 1. yarn 
