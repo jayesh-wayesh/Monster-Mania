@@ -39,7 +39,7 @@ export default function CreateMonster() {
     e.preventDefault();
 
     const newMonsters = {
-      last_nft_id: 150, // temp variable till demo app is not attached to api
+      last_nft_id: 380, // temp variable till demo app is not attached to api
       editions: editions,
       media_id: monsterMediaID,
     }
