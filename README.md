@@ -4,15 +4,21 @@ Demo app for SaaS api project (WIP)
 
 ## Steps to run it locally
 
-#### Frontend
+#### 1. git clone [https://github.com/jayesh-wayesh/Monster_Mania.git](https://github.com/jayesh-wayesh/Monster_Mania.git)
+#### 2. Set branch to `main`
 
-1. yarn 
-2. yarn start
-3. go to localhost:3000
+#### 3. Start Frontend
 
-#### Backend
+- yarn 
+- yarn start
+- go to localhost:3000
 
-1. cd backend
-2. yarn
-3. nodemon server
-4. go to localhost:5000
+#### 4. Start Backend
+
+- cd backend
+- create `.env` file and update `ATLAS_URI=<Your mongodb atlas url>`
+- yarn
+- nodemon server
+- go to localhost:5000
+
+NOTE: I'm using MongoDB Atlas for hosting my mongoDB database.
