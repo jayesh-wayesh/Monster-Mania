@@ -3,13 +3,6 @@ let Monster = require('../models/monster.model');
 let User = require('../models/user.model');
 
 
-/**
- *   Doubts:
- * 
- *   @param content: What exactly is this ?
- *   @param edition: Where to fetch this from ? 
- *   
- */
 
 // Fetch all monsters
 router.route('/').get((req, res) => {
@@ -61,7 +54,7 @@ router.route('/create').post(async (req,res) => {
 
     }
     
-    User.findOne({ username: 'dev'})
+    User.findOne({ account_id: 'dev'})
         .then(user => {
             user.monsters = user.monsters.concat(newMonstersArray)
             console.log(user)
@@ -81,7 +74,7 @@ router.route('/transfer').put(async (req, res) => {
     var monsterToBeTransferred
 
     // Remove from developer's account
-    await User.findOne({username: 'dev' })
+    await User.findOne({account_id: 'dev' })
             .populate('monsters')
             .then(user => {
 
@@ -116,7 +109,7 @@ router.route('/transfer').put(async (req, res) => {
 
 
     // Add to user's account
-    await User.findOne({username: req.body.recipient })
+    await User.findOne({ account_id: req.body.recipient })
             .then(user => {
                 user.monsters.push(monsterToBeTransferred)
                 console.log('user')
