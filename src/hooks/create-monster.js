@@ -1,52 +1,58 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from 'axios';
+import {getMonsterName, getmonsterImage, monsterNames} from "../helpers/content"
+
 
 export default function CreateMonster() {
 
   const inputRef = useRef(null);
-  const monsterNames = ["Monster 1","Monster 2","Monster 3","Monster 4","Monster 5","Monster 6","Monster 7","Monster 8","Monster 9","Monster 10","King Monster"]
-  const [monsterList, setMonsterList] = useState([])
+  const [monsterDropDown, setMonsterDropDown] = useState([])
   const [monster, setMonster] = useState('')
-  const [imageUrl, setImageUrl] = useState('')
+  const [monsterProperties, setMonsterProperties] = useState('')
   const [editions, setEditions] = useState(0)
-  const [monsterMediaID, setMonsterMediaID] = useState()
+
 
   // initialzing monster list
-  useEffect(() => {
-    setMonsterList(monsterNames)
+  useEffect(() => {    
+    setMonsterDropDown(monsterNames)
   }, []);
   
+
   // current selected monster
   const onChangeMonster = (e) => {
-    setMonster(e.target.value)
+    var selectedMonster = e.target.value
+    setMonster(selectedMonster)
 
     monsterNames.map((monsterName,index) => {
-      if(monsterName == e.target.value){
-        var mediaID = index + 1
-        var url = "https://storage.googleapis.com/opensea-prod.appspot.com/creature/" + mediaID + ".png"
-        setImageUrl(url)
-        setMonsterMediaID(mediaID)
+      if(monsterName === selectedMonster){
+        var name = getMonsterName(index)
+        var imageUrl = getmonsterImage(index)
+        var monsterID = index + 1
+        setMonsterProperties({name: name, imageUrl: imageUrl, monsterID: monsterID})
       }
     })
   }
+
 
   // update number of editions to be minted
   const onChangeEditions = (e) => {
     setEditions(e.target.value)
   }
    
+
   const onSubmit = (e) => {
     e.preventDefault();
 
     const newMonsters = {
-      last_nft_id: 380, // temp variable till demo app is not attached to api
+      last_nft_id: 220, // temp variable till demo app is not attached to api
       editions: editions,
-      media_id: monsterMediaID,
+      monsterProperties: monsterProperties
     }
 
     axios.post('http://localhost:5000/monsters/create', newMonsters)
          .then(res => console.log(res.data));
   }
+
 
   return (
     <section className="section">
@@ -60,7 +66,7 @@ export default function CreateMonster() {
               value={monster}
               onChange={onChangeMonster}>
               {
-                monsterList.map(function(monster,index) {
+                monsterDropDown.map(function(monster,index) {
                   return <option 
                     key={index}
                     value={monster}>{monster}

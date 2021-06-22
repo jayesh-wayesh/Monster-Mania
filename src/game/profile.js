@@ -1,103 +1,171 @@
 import React, { useState, useEffect } from "react"
 import MonsterCard from '../components/monster-card'
 import TransferMonster from '../hooks/transfer-monster'
-import RetrieveMonster from '../hooks/retrieve-monster'
+import RetrieveMonsters from '../hooks/retrieve-monsters'
 import DeleteMonster from '../hooks/delete-monster'
 import Timer from '../helpers/timer';
+import { getRandomMonster } from '../helpers/content'
+import { updateWinner, isWinner, updateTimeOfLatestDrop, getNewTimerValue } from '../hooks/update-game-status'
 
-const getRandomMonster = () => {
-    const min = 1;
-    const max = 10;
-    const mediaID =  min + Math.floor(Math.random() * (max - min));
-    return mediaID;
-}
+const NFT_DROP_INTERVAL = 60
 
-function sleep(ms) {
-    console.log('dlwledwedlweml')
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
 
 export default function Profile(props){
 
     const [collection, setCollection] = useState(new Array(12).fill(0))
     const [lockedMonsters, setLockedMonsters] = useState()
     const [unlockedMonsters, setUnlockedMonsters] = useState()
-    const [delay, setDelay] = useState(null);
+    const [delay, setDelay] = useState()
     const [transferStatus, setTransferStatus ] = useState()
     const [newMonster, setNewMonster] = useState()
     const [winner, setWinner] = useState(false)
-    
+    const [monsterEditionArray, setMonsterEditionArray] = useState(new Array(12).fill(0))
+    const [timerCount, setTimerCount] = useState()
+    const [startGame, setStartGame] = useState(false)
+    const [dropOnLogin, setDropOnLogin] = useState(true)
+ 
     // For testing we are using : current_monster  = current_monster + 1
     //     instead of using : current_monster  = random()
     const [currentMediaID, setCurrentMediaID] = useState(1)
+
+    useEffect(async () => {
+
+        if(props.oldUser){
+
+            const resp = await isWinner( props.username )
+            if(resp){
+                setWinner(true)
+            }else{
+                const newTimerValue = await getNewTimerValue( props.username, NFT_DROP_INTERVAL )
+                if( newTimerValue !== NFT_DROP_INTERVAL ){
+                    setDropOnLogin(false)
+                }
+                setTimerCount( newTimerValue )  
+                setStartGame(true) 
+            } 
+        }else{
+            setTimerCount( NFT_DROP_INTERVAL )
+            setStartGame(true)
+        }
+
+    }, []);
     
 
     useEffect(async () => {
-        
-        if(!delay && !winner){
 
-            //var monsterMediaID = getRandomMonster()
-            var monsterMediaID = currentMediaID
-            setCurrentMediaID(currentMediaID + 1)
+        if(startGame && !delay && !winner){
+            
+            var updatedMonsterEditionArray = [] 
+            var updatedCollection = []
+            var response = []
 
-            setTransferStatus('Unlocking monster...')
-            console.log(monsterMediaID)
-            setNewMonster(monsterMediaID)
+            // In case user is an existing one and has just entered the game 
+            if(dropOnLogin){
+                
+                // Next NFT drop
+                var monsterID = currentMediaID
+                setCurrentMediaID(currentMediaID + 1)
+                setTransferStatus('Unlocking monster...')
+                setNewMonster(monsterID)
+                
+                // update monster edition for transferred monster
+                updatedMonsterEditionArray = await TransferMonster({username: props.username, monsterID: monsterID, monsterEditionArray: monsterEditionArray })
+                setMonsterEditionArray(updatedMonsterEditionArray) 
 
-            //await sleep(8000)
-            await TransferMonster({username: props.username, media_id: monsterMediaID })
-                    
-            const updatedCollection = await RetrieveMonster({ username: props.username })
+                // update database
+                await updateTimeOfLatestDrop(props.username)
+            }else{
+                setDropOnLogin(true)
+            }
+            
+            // In case user is an old one, we need to initialise edition array for existing monsters once 
+            // along with updated monster collection   
+            if( props.oldUser ){
+                response = await RetrieveMonsters({ username: props.username, monsterEditionArray: monsterEditionArray })
+                updatedMonsterEditionArray = response[1]
+                setMonsterEditionArray(updatedMonsterEditionArray)
+                props.setOldUser(false)
+            }else{
+                response = await RetrieveMonsters({ username: props.username })
+            }
+            updatedCollection = response[0]
             setCollection(updatedCollection)
-            updateDisplay(updatedCollection)
-                    
+
+            // update UI
+            updateDisplay(updatedCollection, updatedMonsterEditionArray)
+
+            // King monster transfer complete
             setTransferStatus(null)
+
+            // Start timer
             setDelay(1000)
         }
-      }, [delay]);
+      }, [delay, startGame]);
 
       
-    const updateDisplay = (monsterList) => {
+    const updateDisplay = (monsterList, updatedMonsterEditionArray) => {
         
         var unlockedMonstersList = []
         var lockedMonstersList = []
 
         monsterList.forEach(
-            function(value,key,map){
-              if(value > 0){
-                unlockedMonstersList.push(          
-                  <MonsterCard 
-                    currentMonster={key}
-                    monsterCount={value}
-                  />
-                )
-              }else if(key !== 0 && key !== 11){
-                lockedMonstersList.push(          
-                  <MonsterCard 
-                    currentMonster={key}
-                    monsterCount={value}
-                  />
-                )
-              }
+            (monsterCount,monsterId,map) => {
+
+                var monsterEdition = updatedMonsterEditionArray[ monsterId ]
+                
+                if(monsterCount > 0){
+                    unlockedMonstersList.push(          
+                        <MonsterCard 
+                            currentMonster={monsterId}
+                            monsterCount={monsterCount}
+                            edition={monsterEdition}
+                        />
+                    )
+                }else if(monsterId !== 0 && monsterId !== 11){
+                    lockedMonstersList.push(          
+                        <MonsterCard 
+                            currentMonster={monsterId}
+                            monsterCount={monsterCount}
+                            edition={monsterEdition}
+                        />
+                    )
+                }
             }
         )
-
+        
+        // Update UI
         setUnlockedMonsters(unlockedMonstersList)
         setLockedMonsters(lockedMonstersList)
+        
+        // Check if user has collected all the 10 monsters
         checkWinner(lockedMonstersList)
     }
 
 
     const checkWinner = async (lockedMonstersList) => {
+        
+        // User collected all the 10 monsters
         if(lockedMonstersList.length == 0){
 
-            setWinner(true)
+            // King monster transfer starts
+            setTransferStatus('Unlocking monster...')
 
             // call delete-monster
             await DeleteMonster({username: props.username })
 
             // transfer King monster
-            await TransferMonster({username: props.username, media_id: 11 })
+            const updatedMonsterEditionArray = await TransferMonster({username: props.username, monsterID: 11, monsterEditionArray: monsterEditionArray })
+            setMonsterEditionArray(updatedMonsterEditionArray) 
+
+            // King monster transfer complete
+            setTransferStatus(null)
+            
+            // update state
+            setWinner(true)
+            
+            // update database
+            await updateTimeOfLatestDrop( props.username )
+            await updateWinner( props.username )
         }
     }
 
@@ -106,16 +174,20 @@ export default function Profile(props){
         <>
             {winner &&
                 <section className="section-nft-drop">
-                    <h4>Congrats, You Won King Monster! 🎉</h4>
+                    {transferStatus
+                        ? <h4>Unlocking King Monster..</h4>
+                        : <h4>Congrats, You Won King Monster! 👑</h4>
+                    }
                     <div className="container">
                         <MonsterCard 
                             currentMonster={11}
-                            monsterCount={1}
+                            monsterCount={transferStatus ? 0 : 1}
+                            edition={transferStatus ? null : monsterEditionArray[11]}
                         />
                     </div>
                 </section>
             } 
-            {!winner &&
+            {startGame && !winner &&
                 <>
                     {newMonster &&
                         <section className="section-nft-drop">
@@ -127,6 +199,7 @@ export default function Profile(props){
                                 <MonsterCard 
                                     currentMonster={newMonster}
                                     monsterCount={transferStatus ? 0 : collection[newMonster]}
+                                    edition={transferStatus ? null : monsterEditionArray[newMonster]}
                                 />
                             </div>
                         </section>
@@ -142,6 +215,7 @@ export default function Profile(props){
                     <Timer
                         delay={delay}
                         setDelay={setDelay}
+                        timerCount={timerCount} 
                     />
                     <section className="section">
                         <h2>Missing Monsters</h2>

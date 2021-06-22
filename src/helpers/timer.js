@@ -1,9 +1,17 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react"
+const NFT_DROP_INTERVAL = 60
+
 
 export default function Timer(props) {
 
     const [t, setT] = useState({});
-    const [count, setCount] = useState(10);
+    const [count, setCount] = useState();
+
+
+    useEffect(() => {
+      setCount( props.timerCount )
+    }, []);
+
 
     const convertSecondsToTime = (secs) => {
         let hours = Math.floor(secs / (60 * 60));
@@ -30,7 +38,7 @@ export default function Timer(props) {
 
             if (count === 0) {
                props.setDelay(null);
-               setCount(10)
+               setCount(NFT_DROP_INTERVAL)
             }
     }, props.delay);
 
@@ -58,7 +66,7 @@ function useInterval(callback, delay) {
     function tick() {
       savedCallback.current();
     }
-    if (delay !== null) {
+    if (delay !== null && delay !== undefined) {
       let id = setInterval(tick, delay);
       console.log(id);
       return () => clearInterval(id);

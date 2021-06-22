@@ -20,10 +20,10 @@ router.route('/create').post(async (req,res) => {
      *   NFT creation api
      * 
      *    @param developer_id: ENV_VARIABLE_DEVELOPER_ID
-     *    @param recipient_account_id: ENV_VARIABLE_DEVELOPER_ACCOUNT
+     *    @param recipient_account_id: 'dev'
      *    @param number: req.body.editions
-     *    @param developer_metadata: req.body.developer_metadata
-     *    @param content: req.body.content_url
+     *    @param developer_metadata: {name: req.body.monsterProperties.name, monster_id: req.body.monsterProperties.monsterID}
+     *    @param content: req.body.monsterProperties.imageUrl
      * 
      *    curl -X POST -H “Authorization: Bearer <string>” 
      *         -H “Content-Type: multipart/form-data” 
@@ -44,7 +44,7 @@ router.route('/create').post(async (req,res) => {
         const newMonster = new Monster({
             nft_id: Number(req.body.last_nft_id) + i,  // value added is temporary 
             edition: i,  // value added is temporary 
-            media_id: req.body.media_id,
+            media_id: req.body.monsterProperties.monsterID
         });
         
         //newMonstersArray.push(newMonster)
@@ -70,7 +70,7 @@ router.route('/create').post(async (req,res) => {
 // NFT Transfer
 router.route('/transfer').put(async (req, res) => {
 
-    const media_id = req.body.media_id
+    const media_id = req.body.monsterID
     var monsterToBeTransferred
 
     // Remove from developer's account
@@ -120,7 +120,7 @@ router.route('/transfer').put(async (req, res) => {
                     .catch(err => res.status(400).json('Error: ' + err))
             })
 
-    res.status(200).json('NFTs transferred')
+    res.status(200).json(monsterToBeTransferred)
 
 });
 

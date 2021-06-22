@@ -1,5 +1,11 @@
 .App {
   text-align: center;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  right: 0px;
+  z-index: -1;
+
 }
 
 .App-logo {
@@ -13,21 +19,23 @@
   }
 }
 
+
 .Container {
   /* background-image: linear-gradient(to right, #40E0D0, #FF8C00,#FF0080) ; */
-  background-color: #000;
+  background-color: #191919;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: #F4F4F4;
 }
 
 h1{
   font-size: 72px;
-  background: -webkit-linear-gradient(left, #060135, #7303c0,#ec38bc, #fdeff9);
+  background: -webkit-linear-gradient(left, #600083, #cbb4d4);
+
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -35,42 +43,55 @@ h1{
 
 span{
   display: inline;
-  background: -webkit-linear-gradient(left, #0d0366, #7303c0,#ec38bc, #fdeff9);
-  -webkit-background-clip: text;
+  color: #cbb4d4;
+  /* background: -webkit-linear-gradient(left, #5aff15, #00b712); */
+  /* background: -webkit-linear-gradient(left, #0d0366, #7303c0,#ec38bc, #fdeff9); */
+  /* -webkit-background-clip: text;
   background-clip: text;
-  -webkit-text-fill-color: transparent;
+  -webkit-text-fill-color: transparent; */
 }
 
 section{
   height: auto;
   min-height: 400px;
-  background-color: white;
+  background-color: #F7F7F7;
   padding-bottom: 2%;
   display: flex;
   flex-direction: column;
   width: 100%;
-  color: #000;
+  color: #191919;
+
 }
 
 .section-dark{
   height: auto;
-  background-color: #000;
+  /* background: -webkit-linear-gradient(left, #f1f1f1, #808080); */
+  background-color: #191919;
   padding-bottom: 2%;
   display: flex;
   flex-direction: column;
   width: 100%;
-  color: #fff;
+  /* color: #fff; */
+
+  background: -webkit-linear-gradient(left, #f1f1f1, #808080);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 
 .section-nft-drop{
   height: auto;
-  background-image: linear-gradient(to right, #0d0366, #7303c0,#ec38bc, #fdeff9);
+  /* background-image: linear-gradient(to right, #0d0366, #7303c0,#ec38bc, #fdeff9); */
+  /* background-image: linear-gradient(to bottom,#cfcfcf, #F7F7F7); */
+  
+  /* background-image: linear-gradient(to right,#F7F7F7, #E8E8E8, #F7F7F7);  */
+  background-color: #E8E8E8;
   padding-bottom: 2%;
   display: flex;
   flex-direction: column;
   width: 100%;
-  color: #fff;
+  color: #191919;
 }
 
 .App-link {
@@ -128,4 +149,18 @@ section .container {
 
 p{
   font-size: 20px;
+}
+
+.container-x{
+  
+  position: absolute;
+  right: 20px;
+  top: 10px;
+  z-index: 10;
+  font-size: 20px;
+
+  background: -webkit-linear-gradient(left, #f1f1f1, #808080);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }

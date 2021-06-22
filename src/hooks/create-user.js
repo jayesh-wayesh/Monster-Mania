@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import axios from 'axios';
 
 
-
 export default function CreateUser(props) {
 
   const [userInput, setUserInput] = useState('')
@@ -11,7 +10,7 @@ export default function CreateUser(props) {
     setUserInput(e.target.value)
   }
    
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     
     const username = userInput;
@@ -19,11 +18,22 @@ export default function CreateUser(props) {
       username: username, //<string>
     }
 
-    axios.post('http://localhost:5000/users/add', newUser)
-         .then(res => console.log(res.data))
-         .then(() => props.setUsername(username))
-
-    console.log('here')
+    await axios.get('http://localhost:5000/users/')
+      .then(res => {  
+        var userExist = res.data.find(user => user === username)
+        return userExist
+      })
+      .then(userExist => {
+        if(userExist === undefined) {
+          axios.post('http://localhost:5000/users/add', newUser)
+            .then(res => console.log(res.data))
+        }else{
+          props.setOldUser(true)
+        }
+        props.setUsername(username)
+      })
+    
+    localStorage.setItem("username", username)
   }
 
   return (

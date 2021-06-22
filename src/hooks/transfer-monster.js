@@ -1,17 +1,16 @@
-import React, { useState, useEffect, useRef } from "react";
 import axios from 'axios';
 
 export default async function TransferMonster(props){
     
     const transaction = {
         recipient: props.username,
-        media_id: props.media_id,
+        monsterID: props.monsterID,
     }
-
-    console.log('transaction')
-    console.log(transaction)
     
-    return await axios.put('http://localhost:5000/monsters/transfer', transaction)
-           .then(res => res)
-
+    const monsterTransferred = await axios.put('http://localhost:5000/monsters/transfer', transaction)
+        .then(res => res.data)
+    
+    var updatedMonsterEditionArray = props.monsterEditionArray
+    updatedMonsterEditionArray[ props.monsterID ] = monsterTransferred.edition
+    return updatedMonsterEditionArray
 }
