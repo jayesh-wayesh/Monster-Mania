@@ -1,21 +1,27 @@
-const router = require('express').Router();
-let User = require('../models/user.model');
+const router = require('express').Router()
+const User = require('../models/user.model')
+const request = require('request')
+const jwt = require('jsonwebtoken')
+
+const SECRET_PREFIX=process.env.SECRET_PREFIX
+const SECRET_SUFFIX=process.env.SECRET_SUFFIX
+const BASE_URL=process.env.BASE_URL 
+const DEVELOPER_PRIVATE_KEY=process.env.DEVELOPER_PRIVATE_KEY
+const DEVELOPER_ID=Number(process.env.DEVELOPER_ID)
 
 
 // Return all users
 router.route('/').get((req, res) => {
   
   User.find()
-    .then(users => 
-      {
-        var usersList = []
-        users.forEach(user => 
-          { 
-            usersList.push( user.account_id ) 
-            console.log(usersList) 
-          }) 
-        return res.json(usersList)
-      })
+    .then(users => {
+      var usersList = []
+      users.forEach(user => { 
+        usersList.push( user.account_id ) 
+        console.log(usersList) 
+      }) 
+      return res.json(usersList)
+    })
     .catch(err => res.status(400).json('Error: ' + err));
     
 });
@@ -36,16 +42,15 @@ router.route('/:username/monsters').get((req, res) => {
 // Account creation api
 router.route('/add').post((req, res) => {
    
-  console.log('er4t')
-    const newUsername = req.body.username;
-    const newPasscode = process.env.SECRET_PREFIX + newUsername + process.env.SECRET_SUFFIX;
+  const playerUsername = req.body.username;
+  const playerPasscode = SECRET_PREFIX + playerUsername + SECRET_SUFFIX;
 
     /**
      *   Account creation api
      * 
      *    @param developer_id: 'dev'
-     *    @param account_id: newUsername
-     *    @param passcode: newPasscode
+     *    @param account_id: playerUsername
+     *    @param passcode: playerPasscode
      * 
      *    curl -X POST -H “Authorization: Bearer <string>”
      *         -H “Content-Type: application/json” 
@@ -53,22 +58,52 @@ router.route('/add').post((req, res) => {
      *         https://{hostname}/api/v1/accounts
      * 
      */
+
+  /////// account creation api call starts  ////////////
+
+  var data = {
+    'developer_id': DEVELOPER_ID,     
+    'account_id': playerUsername,            
+    'passcode': playerPasscode,          
+  }
+  
+  var jwt = generateAccessToken()
+  var options = {
+    uri: BASE_URL + '/api/v1/accounts',
+    body: JSON.stringify(data),
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + jwt,               // Developer’s JWT.
+      'Content-Type': 'application/json'
+    }
+  }
+
+  request(options, (error, response) => {
     
+    console.log('user account creation api response :')
+    console.log(error,response.body)
 
-    const newUser = new User({
-      account_id: newUsername,
-      passcode: newPasscode,
-      blockchain: "FLOW",
-      blockchainAddress: "0xTESTING",
-      monsters: []
-    });
+  });
 
-    console.log('newUser')
-    console.log(newUser)
+  /////// account creation api call ends  ////////////
+
+
+  const newUser = new User({
+    account_id: playerUsername,
+    passcode: playerPasscode,
+    blockchain: "FLOW",
+    blockchainAddress: "0xTESTING",
+    monsters: []
+  });
+
+  console.log('newUser')
+  console.log(newUser)
  
-    newUser.save()
-       .then((user) => res.json('User ' + user.account_id + ' added!'))
-       .catch(err => res.status(400).json('Error: ' + err));
+  return res.json('User ' + newUser.account_id + ' added!')
+  // newUser.save()
+  //   .then((user) => res.json('User ' + user.account_id + ' added!'))
+  //   .catch(err => res.status(400).json('Error: ' + err))
+
 });
 
 
@@ -112,6 +147,34 @@ router.route('/:username/monsters').delete((req, res) => {
      */
  
     //res.status(200).json('NFTs deleted!')
+
+  /////// NFT Deletion api call starts  ////////////
+
+  var data = {
+    'developer_id': Number(DEVELOPER_ID),     
+    'owner_account_id': username,            
+    'nft_ids': nft_ids,          
+  }
+  
+  var jwt = generateAccessToken()
+  var options = {
+    uri: BASE_URL + '/api/v1/nfts',
+    body: JSON.stringify(data),
+    method: 'DELETE',
+    headers: {
+      'Authorization': 'Bearer ' + jwt,               // Developer’s JWT.
+      'Content-Type': 'application/json'
+    }
+  }
+
+  request(options, (error, response) => {
+    
+    console.log('user account creation api response :')
+    console.log(error,response.status)
+
+  });
+
+  /////// NFT Deletion api call ends  ////////////
 });
 
 
@@ -166,5 +229,10 @@ router.route('/:username/timerdetails').put((req, res) => {
     .catch(err => res.status(400).json('Error: ' + err));
 
 });
+
+function generateAccessToken() {
+  return jwt.sign(DEVELOPER_ID, DEVELOPER_PRIVATE_KEY)
+}
+
 
 module.exports = router;
