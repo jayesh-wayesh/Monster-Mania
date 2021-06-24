@@ -8,6 +8,7 @@ const SECRET_SUFFIX=process.env.SECRET_SUFFIX
 const BASE_URL=process.env.BASE_URL 
 const DEVELOPER_PRIVATE_KEY=process.env.DEVELOPER_PRIVATE_KEY
 const DEVELOPER_ID=Number(process.env.DEVELOPER_ID)
+const SERVER_NAME=process.env.SERVER_NAME
 
 
 // Return all users
@@ -45,21 +46,7 @@ router.route('/add').post((req, res) => {
   const playerUsername = req.body.username;
   const playerPasscode = SECRET_PREFIX + playerUsername + SECRET_SUFFIX;
 
-    /**
-     *   Account creation api
-     * 
-     *    @param developer_id: 'dev'
-     *    @param account_id: playerUsername
-     *    @param passcode: playerPasscode
-     * 
-     *    curl -X POST -H “Authorization: Bearer <string>”
-     *         -H “Content-Type: application/json” 
-     *         -d ‘{“account_id”: <integer>, “account_id”: <string>, “passcode”: <string>}’ 
-     *         https://{hostname}/api/v1/accounts
-     * 
-     */
-
-  /////// account creation api call starts  ////////////
+  /********** Account Creation api call starts **********/
 
   var data = {
     'developer_id': DEVELOPER_ID,     
@@ -81,12 +68,11 @@ router.route('/add').post((req, res) => {
   request(options, (error, response) => {
     
     console.log('user account creation api response :')
-    console.log(error,response.body)
+    console.log(error,response)
 
   });
 
-  /////// account creation api call ends  ////////////
-
+  /********** Account Creation api call ends **********/
 
   const newUser = new User({
     account_id: playerUsername,
@@ -131,24 +117,8 @@ router.route('/:username/monsters').delete((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err))
     })
     .then(() => res.status(200).json('NFTs deleted!'))
-    
-    /**
-     *   NFT deletion api
-     * 
-     *    @param developer_id: 'dev'
-     *    @param owner_account_id: username
-     *    @param nft_ids: nft_ids
-     *    @param edition: 
-     * 
-     *    curl -X DELETE -H “Authorization: Bearer <string>” 
-     *         -H “Content-Type:application/json” 
-     *         -d ‘{“nft_id”: <string>}’ 
-     *         https://{hostname}/api/v1/nfts/{nft-id}/{edition}
-     */
- 
-    //res.status(200).json('NFTs deleted!')
 
-  /////// NFT Deletion api call starts  ////////////
+  /********** NFT Deletion api call starts **********/
 
   var data = {
     'developer_id': Number(DEVELOPER_ID),     
@@ -174,7 +144,7 @@ router.route('/:username/monsters').delete((req, res) => {
 
   });
 
-  /////// NFT Deletion api call ends  ////////////
+  /********** NFT Deletion api call ends **********/
 });
 
 
@@ -230,8 +200,21 @@ router.route('/:username/timerdetails').put((req, res) => {
 
 });
 
+
 function generateAccessToken() {
-  return jwt.sign(DEVELOPER_ID, DEVELOPER_PRIVATE_KEY)
+  
+  var DeveloperClaims = {
+    'DeveloperID': DEVELOPER_ID,
+    'StandardClaims': {
+      'ExpiresAt': Date.now() + 15000,
+      'Issuer': SERVER_NAME
+    }
+  }
+
+  const buffer = Buffer.from(DEVELOPER_PRIVATE_KEY, 'base64')
+  const bufString = buffer.toString('hex')
+
+  return jwt.sign(DeveloperClaims, bufString)
 }
 
 

@@ -32,6 +32,41 @@ router.route('/create').post(async (req,res) => {
      *         https://{hostname}/api/v1/nfts
      * 
      */
+
+  /********** NFT Creation api call starts **********/
+
+  var developerMetadata = {
+    name: req.body.monsterProperties.name,
+    monster_id: req.body.monsterProperties.monsterID
+  }
+
+  var data = {
+    'developer_id': DEVELOPER_ID,     
+    'recipient_account_id': 'dev',            
+    'number': req.body.editions,    
+    'developer_metadata': JSON.stringify( developerMetadata ),
+    'content': req.body.monsterProperties.imageUrl,      
+  }
+  
+  var jwt = generateAccessToken()
+  var options = {
+    uri: BASE_URL + '/api/v1/nfts',
+    body: JSON.stringify(data),
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + jwt,               // Developer’s JWT.
+      'Content-Type': 'application/json'
+    }
+  }
+
+  request(options, (error, response) => {
+    
+    console.log('NFT creation api response :')
+    console.log(error,response.body)
+
+  });
+
+  /********** Account Creation api call ends **********/
     
     // Temporary workaround to create NFTs 
     var editions = req.body.editions
@@ -106,6 +141,35 @@ router.route('/transfer').put(async (req, res) => {
      *         https://{hostname}/api/v1/nfts/{nft-id}/{edition}
      * 
      */
+
+    /********** NFT Transfer api call starts **********/
+
+    var data = {
+        'developer_id': DEVELOPER_ID,     
+        'sender_account_id': 'dev',            
+        'recipient_account_id': req.body.recipient,    
+        'nft_ids': [ monsterToBeTransferred.nft_id ]
+    }
+    
+    var jwt = generateAccessToken()
+    var options = {
+        uri: BASE_URL + '/api/v1/nfts',
+        body: JSON.stringify(data),
+        method: 'PUT',
+        headers: {
+        'Authorization': 'Bearer ' + jwt,               // Developer’s JWT.
+        'Content-Type': 'application/json'
+        }
+    }
+
+    request(options, (error, response) => {
+        
+        console.log('NFT Transfer api response :')
+        console.log(error,response.body)
+
+    });
+
+    /********** NFT Transfer api call ends **********/
 
 
     // Add to user's account
