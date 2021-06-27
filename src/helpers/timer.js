@@ -7,11 +7,9 @@ export default function Timer(props) {
     const [t, setT] = useState({});
     const [count, setCount] = useState();
 
-
     useEffect(() => {
       setCount( props.timerCount )
     }, []);
-
 
     const convertSecondsToTime = (secs) => {
         let hours = Math.floor(secs / (60 * 60));
@@ -21,9 +19,9 @@ export default function Timer(props) {
         let seconds = Math.ceil(divisor_for_seconds);
 
         let obj = {
-        h: hours,
-        m: minutes,
-        s: seconds
+			h: hours,
+			m: minutes,
+			s: seconds
         };
         return obj;
     };
@@ -43,33 +41,33 @@ export default function Timer(props) {
     }, props.delay);
 
     return (
-      <section className="section-dark">
-        <h2>Time left until next Drop</h2>
-        {t.s
-          ? <h1>{t.h}:{t.m}:{t.s}</h1>
-          : <h1>00:00:00</h1>
-        }
-      </section>
+        <section className="section-dark">
+			<h2>Time left until next Drop</h2>
+			{t.s
+				? <h1>{t.h}:{t.m}:{t.s}</h1>
+				: <h1>00:00:00</h1>
+			}
+        </section>
     );
 }
 
 function useInterval(callback, delay) {
-  const savedCallback = useRef();
+	const savedCallback = useRef();
 
-  // Remember the latest function.
-  useEffect(() => {
-    savedCallback.current = callback;
-  }, [callback]);
+	// Remember the latest function.
+	useEffect(() => {
+		savedCallback.current = callback;
+	}, [callback]);
 
-  // Set up the interval.
-  useEffect(() => {
-    function tick() {
-      savedCallback.current();
-    }
-    if (delay !== null && delay !== undefined) {
-      let id = setInterval(tick, delay);
-      console.log(id);
-      return () => clearInterval(id);
-    }
-  }, [delay]);
+	// Set up the interval.
+	useEffect(() => {
+		function tick() {
+			savedCallback.current();
+		}
+		if (delay !== null && delay !== undefined) {
+			let id = setInterval(tick, delay);
+			console.log(id);
+			return () => clearInterval(id);
+		}
+	}, [delay]);
 }
