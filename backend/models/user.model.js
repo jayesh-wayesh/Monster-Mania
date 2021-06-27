@@ -8,6 +8,7 @@ const userSchema = new Schema({
   passcode: {type: String, required: true},
   blockchain: {type: String, required: true},
   blockchainAddress: {type: String, required: true},
+  jwt: {type: String, required: true},
   monsters: [{ type: Schema.Types.ObjectId, ref: Monster}],
   game_info: {
     isWinner: {type: Boolean, default: false}, 
@@ -19,7 +20,7 @@ const userSchema = new Schema({
 });
 
 var secret = process.env.SOME_LONG_UNGUESSABLE_STRING;
-userSchema.plugin(encrypt, { secret: secret, encryptedFields: ['passcode'] });
+userSchema.plugin(encrypt, { secret: secret, encryptedFields: ['passcode','jwt'] });
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;
