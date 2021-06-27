@@ -1,14 +1,9 @@
 const router = require('express').Router()
 const User = require('../models/user.model')
-const request = require('request')
-const jwt = require('jsonwebtoken')
+const blockCoApi = require('../blockco/api_calls')
 
 const SECRET_PREFIX=process.env.SECRET_PREFIX
 const SECRET_SUFFIX=process.env.SECRET_SUFFIX
-const BASE_URL=process.env.BASE_URL 
-const DEVELOPER_PRIVATE_KEY=process.env.DEVELOPER_PRIVATE_KEY
-const DEVELOPER_ID=Number(process.env.DEVELOPER_ID)
-const SERVER_NAME=process.env.SERVER_NAME
 
 
 // Return all users
@@ -29,54 +24,60 @@ router.route('/').get((req, res) => {
 
 
 // Find monsters of a given user
-router.route('/:username/monsters').get((req, res) => {
-
+router.route('/:username/monsters').get(async (req, res) => {
+  
   var username = req.params.username
+
+  // NFT Retrieval api call 
+  const response = await blockCoApi.retrieveNFT(username)
+  if(response.statusCode !== 200){
+    return res.json({"Error": response})
+  }
+
+  var monsters = response.body.nft_infos
+  var monsterResponse = []
+  if(monsters){
+    monsters.forEach(monster => {
+      monsterResponse.push({
+        'nft_id': monster.id,
+        'edition': monster.edition,
+        'media_id': JSON.parse(monster.developer_metadata).monster_id,
+      })
+    })
+  }
+  return res.json(monsterResponse)
+
+  /** OR **/
+    
+  /*
   User.findOne({account_id: username})
     .populate('monsters')
     .then(user => res.json(user.monsters))
     .catch(err => res.status(400).json('Error: ' + err));
+  */
 
 });
 
 
-// Account creation api
-router.route('/add').post((req, res) => {
+// Create new account
+router.route('/add').post(async (req, res) => {
    
-  const playerUsername = req.body.username;
-  const playerPasscode = SECRET_PREFIX + playerUsername + SECRET_SUFFIX;
-
-  /********** Account Creation api call starts **********/
-
-  var data = {
-    'developer_id': DEVELOPER_ID,     
-    'account_id': playerUsername,            
-    'passcode': playerPasscode,          
-  }
+  const newAccountUsername = req.body.username;
+  const newAccountPasscode = SECRET_PREFIX + newAccountUsername + SECRET_SUFFIX;
   
-  var jwt = generateAccessToken()
-  var options = {
-    uri: BASE_URL + '/api/v1/accounts',
-    body: JSON.stringify(data),
-    method: 'POST',
-    headers: {
-      'Authorization': 'Bearer ' + jwt,               // Developer’s JWT.
-      'Content-Type': 'application/json'
-    }
+  const response = await blockCoApi.createAccount(newAccountUsername, newAccountPasscode)
+  if(response.statusCode !== 201){
+    return res.json({"Error": response})
   }
 
-  request(options, (error, response) => {
-    
-    console.log('user account creation api response :')
-    console.log(error,response)
+  const newAccount = response.body
+  return res.json(newAccount)
 
-  });
 
-  /********** Account Creation api call ends **********/
-
+  /*
   const newUser = new User({
-    account_id: playerUsername,
-    passcode: playerPasscode,
+    account_id: newAccountUsername,
+    passcode: newAccountPasscode,
     blockchain: "FLOW",
     blockchainAddress: "0xTESTING",
     monsters: []
@@ -86,6 +87,8 @@ router.route('/add').post((req, res) => {
   console.log(newUser)
  
   return res.json('User ' + newUser.account_id + ' added!')
+  */
+
   // newUser.save()
   //   .then((user) => res.json('User ' + user.account_id + ' added!'))
   //   .catch(err => res.status(400).json('Error: ' + err))
@@ -93,13 +96,14 @@ router.route('/add').post((req, res) => {
 });
 
 
-// NFT deletion api
-router.route('/:username/monsters').delete((req, res) => {
+// Delete monsters of given user
+router.route('/:username/monsters').delete(async(req, res) => {
     
   var nft_ids = []
   var username = req.params.username
 
   // Find the nft_ids of all the monsters user is currently having to burn 
+  /*
   User.findOne({account_id: username })
     .populate('monsters')
     .then(user => {
@@ -117,32 +121,34 @@ router.route('/:username/monsters').delete((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err))
     })
     .then(() => res.status(200).json('NFTs deleted!'))
+  */
 
   /********** NFT Deletion api call starts **********/
 
-  var data = {
-    'developer_id': Number(DEVELOPER_ID),     
-    'owner_account_id': username,            
-    'nft_ids': nft_ids,          
-  }
-  
-  var jwt = generateAccessToken()
-  var options = {
-    uri: BASE_URL + '/api/v1/nfts',
-    body: JSON.stringify(data),
-    method: 'DELETE',
-    headers: {
-      'Authorization': 'Bearer ' + jwt,               // Developer’s JWT.
-      'Content-Type': 'application/json'
+  var response = await blockCoApi.deleteNFTs('testUser2', [6])
+  console.log(response)
+  if(response.statusCode === 401){
+
+    // call refresh token
+    response = await refreshToken('testUser2')
+    if(response.statusCode !== 201){
+      return res.json({"Error": response})
     }
+    
+    // update JWT
+    process.env.testUser2_JWT = response.body.jwt
+
+    // again call Delete NFTs
+    response = await blockCoApi.deleteNFTs('testUser2', [6])
+    if(response.statusCode !== 200){
+      return res.json({"Error": response})
+    }
+
+  }else if(response.statusCode !== 200){
+    return res.json({"Error": response})
   }
 
-  request(options, (error, response) => {
-    
-    console.log('user account creation api response :')
-    console.log(error,response.status)
-
-  });
+  return res.json(response)
 
   /********** NFT Deletion api call ends **********/
 });
@@ -201,21 +207,11 @@ router.route('/:username/timerdetails').put((req, res) => {
 });
 
 
-function generateAccessToken() {
+const refreshToken = async (username) => {
   
-  var DeveloperClaims = {
-    'DeveloperID': DEVELOPER_ID,
-    'StandardClaims': {
-      'ExpiresAt': Date.now() + 15000,
-      'Issuer': SERVER_NAME
-    }
-  }
-
-  const buffer = Buffer.from(DEVELOPER_PRIVATE_KEY, 'base64')
-  const bufString = buffer.toString('hex')
-
-  return jwt.sign(DeveloperClaims, bufString)
+  const passcode = SECRET_PREFIX + username + SECRET_SUFFIX
+  const response = await blockCoApi.refreshToken(username, passcode)
+  return response
 }
-
 
 module.exports = router;

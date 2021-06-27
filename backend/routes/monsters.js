@@ -1,7 +1,10 @@
 const router = require('express').Router();
-let Monster = require('../models/monster.model');
-let User = require('../models/user.model');
+const Monster = require('../models/monster.model');
+const User = require('../models/user.model');
+const blockCoApi = require('../blockco/api_calls')
 
+const SECRET_PREFIX=process.env.SECRET_PREFIX
+const SECRET_SUFFIX=process.env.SECRET_SUFFIX
 
 
 // Fetch all monsters
@@ -10,65 +13,35 @@ router.route('/').get((req, res) => {
     Monster.find()
         .then(monsters => res.json(monsters))
         .catch(err => res.status(400).json('Error: ' + err));
+    
 })
 
 
 // NFT Creation 
 router.route('/create').post(async (req,res) => {
 
-    /**
-     *   NFT creation api
-     * 
-     *    @param developer_id: ENV_VARIABLE_DEVELOPER_ID
-     *    @param recipient_account_id: 'dev'
-     *    @param number: req.body.editions
-     *    @param developer_metadata: {name: req.body.monsterProperties.name, monster_id: req.body.monsterProperties.monsterID}
-     *    @param content: req.body.monsterProperties.imageUrl
-     * 
-     *    curl -X POST -H “Authorization: Bearer <string>” 
-     *         -H “Content-Type: multipart/form-data” 
-     *         -F “recipient_account_id=<string>” 
-     *         -F upload=@{filename} 
-     *         https://{hostname}/api/v1/nfts
-     * 
-     */
+    /********** NFT Creation api call starts **********/
 
-  /********** NFT Creation api call starts **********/
+    const response = await blockCoApi.createNFTs(
+        'testUser5',
+        {
+            'name': req.body.monsterProperties.name,
+            'monster_id': req.body.monsterProperties.monsterID, 
+            'editions': req.body.editions
+        }
+    )
 
-  var developerMetadata = {
-    name: req.body.monsterProperties.name,
-    monster_id: req.body.monsterProperties.monsterID
-  }
-
-  var data = {
-    'developer_id': DEVELOPER_ID,     
-    'recipient_account_id': 'dev',            
-    'number': req.body.editions,    
-    'developer_metadata': JSON.stringify( developerMetadata ),
-    'content': req.body.monsterProperties.imageUrl,      
-  }
-  
-  var jwt = generateAccessToken()
-  var options = {
-    uri: BASE_URL + '/api/v1/nfts',
-    body: JSON.stringify(data),
-    method: 'POST',
-    headers: {
-      'Authorization': 'Bearer ' + jwt,               // Developer’s JWT.
-      'Content-Type': 'application/json'
+    if(response.statusCode !== 201){
+        return res.json({"Error": response})
     }
-  }
-
-  request(options, (error, response) => {
     
-    console.log('NFT creation api response :')
-    console.log(error,response.body)
+    const nft_ids = response.body
+    return res.json(nft_ids)
 
-  });
-
-  /********** Account Creation api call ends **********/
+    /********** Account Creation api call ends **********/
     
     // Temporary workaround to create NFTs 
+    /*
     var editions = req.body.editions
     console.log('editions')
     console.log(req.body.editions)
@@ -98,13 +71,14 @@ router.route('/create').post(async (req,res) => {
                 .then(() => res.status(200).json('NFTs added to developer account '))
                 .catch(err => res.status(400).json('Error: ' + err));
         })
-
+    */
 })
 
 
 // NFT Transfer
 router.route('/transfer').put(async (req, res) => {
 
+    /*
     const media_id = req.body.monsterID
     var monsterToBeTransferred
 
@@ -124,54 +98,38 @@ router.route('/transfer').put(async (req, res) => {
                     .then(() => {console.log('monster removed from developer account!')})
                     .catch(err => res.status(400).json('Error: ' + err))
             })
-    
-    //  Transfer it to user on blockchain        
-    /**
-     *   NFT transfer api
-     * 
-     *    @param developer_id: ENV_VARIABLE_DEVELOPER_ID
-     *    @param sender_account_id: 'dev'
-     *    @param recipient_account_id: req.body.recipient
-     *    @param nft_ids: [monsterToBeTransferred.nft_id]
-     * 
-     * 
-     *    curl -X PUT -H “Authorization: Bearer <string>” 
-     *         -H “Content-Type: application/json” 
-     *         -d ‘{“recipient_account_id”: <string>}’ 
-     *         https://{hostname}/api/v1/nfts/{nft-id}/{edition}
-     * 
-     */
+    */
 
     /********** NFT Transfer api call starts **********/
 
-    var data = {
-        'developer_id': DEVELOPER_ID,     
-        'sender_account_id': 'dev',            
-        'recipient_account_id': req.body.recipient,    
-        'nft_ids': [ monsterToBeTransferred.nft_id ]
+    var response = await blockCoApi.transferNFT('testUser1', 'testUser2', [6])
+    console.log(response)
+    if(response.statusCode === 401){
+  
+      // call refresh token
+      response = await refreshToken('testUser1')
+      if(response.statusCode !== 201){
+        return res.json({"Error": response})
+      }
+      
+      // update JWT
+      process.env.testUser1_JWT = response.body.jwt
+  
+      // again call Transfer NFTs
+      response = await blockCoApi.transferNFT('testUser1', 'testUser2', [6])
+      if(response.statusCode !== 200){
+        return res.json({"Error": response})
+      }
+  
+    }else if(response.statusCode !== 200){
+      return res.json({"Error": response})
     }
-    
-    var jwt = generateAccessToken()
-    var options = {
-        uri: BASE_URL + '/api/v1/nfts',
-        body: JSON.stringify(data),
-        method: 'PUT',
-        headers: {
-        'Authorization': 'Bearer ' + jwt,               // Developer’s JWT.
-        'Content-Type': 'application/json'
-        }
-    }
-
-    request(options, (error, response) => {
-        
-        console.log('NFT Transfer api response :')
-        console.log(error,response.body)
-
-    });
+  
+    return res.json(response)
 
     /********** NFT Transfer api call ends **********/
 
-
+    /*
     // Add to user's account
     await User.findOne({ account_id: req.body.recipient })
             .then(user => {
@@ -185,8 +143,16 @@ router.route('/transfer').put(async (req, res) => {
             })
 
     res.status(200).json(monsterToBeTransferred)
-
+    */
 });
 
+
+const refreshToken = async (username) => {
+  
+    const passcode = SECRET_PREFIX + username + SECRET_SUFFIX
+    const response = await blockCoApi.refreshToken(username, passcode)
+    return response
+}
+  
 
 module.exports = router;
