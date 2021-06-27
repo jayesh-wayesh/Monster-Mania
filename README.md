@@ -21,4 +21,11 @@ Demo app for SaaS api project (WIP)
 - nodemon server
 - go to localhost:5000
 
-NOTE: I'm using MongoDB Atlas for hosting my mongoDB database.
+> NOTE: We are using MongoDB Atlas for hosting my mongoDB database.
+
+<br/>
+
+## References
+
+#### Monster Images
+We are using Blush Design's [Street Life](https://blush.design/collections/2q77tcQgOR3gUha4oprc/street-life) Collection by [YONG](https://blush.design/artists/YONG).
