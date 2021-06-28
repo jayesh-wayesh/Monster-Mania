@@ -1,9 +1,7 @@
 const router = require('express').Router()
 const User = require('../models/user.model')
 const blockCoApi = require('../blockco/api_calls')
-
-const SECRET_PREFIX=process.env.SECRET_PREFIX
-const SECRET_SUFFIX=process.env.SECRET_SUFFIX
+const Token = require('../helpers/token')
 
 
 // Return all users
@@ -13,13 +11,40 @@ router.route('/').get((req, res) => {
         .then(users => {
             var usersList = []
             users.forEach(user => { 
-            usersList.push( user.account_id ) 
-            console.log(usersList) 
-        }) 
-        return res.json(usersList)
-    })
-    .catch(err => res.status(400).json('Error: ' + err));
+                usersList.push( user.account_id ) 
+            }) 
+            return res.json(usersList)
+        })
+        .catch(err => res.status(400).json('Error: ' + err)); 
+});
+
+
+// Create new user account
+router.route('/add').post(async (req, res) => {
+   
+    const newAccountUsername = req.body.username
+    var newAccountPasscode = Token.getPasscode(newAccountUsername)
+  
+    // Create a new account on blockchain using username and passcode
+    const response = await blockCoApi.createAccount(newAccountUsername, newAccountPasscode)
+    if(response.statusCode !== 201){
+        return res.json({"Error": response})
+    }
+    const newAccount = response.body
     
+    // Create a user object and update in database
+    const newUser = new User({
+        account_id: newAccountUsername,
+        passcode: newAccountPasscode,
+        jwt: newAccount.jwt,   
+        blockchain: newAccount.blockchain,
+        blockchainAddress: newAccount.blockchain_address,
+        monsters: []
+    });
+
+    await newUser.save()
+        .then((user) => res.json('User ' + user.account_id + ' added!'))
+        .catch(err => res.status(400).json('Error: ' + err))
 });
 
 
@@ -28,7 +53,9 @@ router.route('/:username/monsters').get(async (req, res) => {
   
     var username = req.params.username
 
-    // NFT Retrieval api call 
+    // Retrieval info of all the NFTs owned by user
+    
+    // OPTION 1: Directly querying blockchain
     /*
     const response = await blockCoApi.retrieveNFT(username)
     if(response.statusCode !== 200){
@@ -36,20 +63,12 @@ router.route('/:username/monsters').get(async (req, res) => {
     }
 
     var monsters = response.body.nft_infos
-    var monsterResponse = []
-    if(monsters){
-        monsters.forEach(monster => {
-            monsterResponse.push({
-                'nft_id': monster.id,
-                'edition': monster.edition,
-                'media_id': JSON.parse(monster.developer_metadata).monster_id,
-            })
-        })
-    }
-    return res.json(monsterResponse)
+    return res.json(monsters)
     */
+
     /** OR **/
     
+    // OPTION 2: Fetching from local database
     User.findOne({account_id: username})
         .populate('monsters')
         .then(user => res.json(user.monsters))
@@ -58,93 +77,58 @@ router.route('/:username/monsters').get(async (req, res) => {
 });
 
 
-// Create new account
-router.route('/add').post(async (req, res) => {
-   
-    const newAccountUsername = req.body.username;
-    const newAccountPasscode = SECRET_PREFIX + newAccountUsername + SECRET_SUFFIX;
-  
-    /*
-    const response = await blockCoApi.createAccount(newAccountUsername, newAccountPasscode)
-        if(response.statusCode !== 201){
-            return res.json({"Error": response})
-    }
-
-    const newAccount = response.body
-    return res.json(newAccount)
-    */
-
-    const newUser = new User({
-        account_id: newAccountUsername,
-        passcode: newAccountPasscode,
-        blockchain: "FLOW",
-        blockchainAddress: "0xTESTING",
-        jwt: process.env.testUser2_JWT,        // TEMP
-        monsters: []
-    });
-
-    console.log('newUser')
-    console.log(newUser)
- 
-    // return res.json('User ' + newUser.account_id + ' added!')
-    newUser.save()
-        .then((user) => res.json('User ' + user.account_id + ' added!'))
-        .catch(err => res.status(400).json('Error: ' + err))
-});
-
-
 // Delete monsters of given user
 router.route('/:username/monsters').delete(async (req, res) => {
     
-    var nft_ids = []
-    var username = req.params.username
+    var nftIds = []
+    const owner = req.params.username
 
-    // Find the nft_ids of all the monsters user is currently having to burn 
-    User.findOne({account_id: username })
+    // Find the nftIds of all the monsters user is currently having to burn 
+    await User.findOne({account_id: owner })
         .populate('monsters')
         .then(user => {
-            
-        user.monsters.forEach(monster => {
-            nft_ids.push(monster.nft_id)
+            user.monsters.forEach(monster => {
+                nftIds.push(monster.nft_id)
+            })
+
+            user.monsters = []
+            user.save()
+                .then(() => {console.log('monsters removed from user account!')})
+                .catch(err => res.status(400).json('Error: ' + err))
         })
 
-        console.log(nft_ids)
-        user.monsters = []
-        console.log(user)
+    // Find the owner jwt
+    var ownerJwt =  await Token.getUserJwt(owner)
 
-        user.save()
-            .then(() => {console.log('monsters removed from user account!')})
-            .catch(err => res.status(400).json('Error: ' + err))
-        })
-        .then(() => res.status(200).json('NFTs deleted!'))
+    // Burn the nfts corresponding to nftIds
+    var response = await blockCoApi.deleteNFTs(owner, nftIds, ownerJwt)
 
-    /********** NFT Deletion api call starts **********/
-    /*
-    var response = await blockCoApi.deleteNFTs('testUser2', [6])
-    console.log(response)
+    // In case owner's jwt expires
     if(response.statusCode === 401){
+        console.log('Trying with new jwt..')
 
         // call refresh token
-        response = await refreshToken('testUser2')
+        response = await Token.refreshToken(owner)
         if(response.statusCode !== 201){
-            return res.json({"Error": response})
+            return res.status(400).json({"Error": response})
         }
         
-        // update JWT
-        process.env.testUser2_JWT = response.body.jwt
+        // update Token
+        ownerJwt = response.body.jwt
 
         // again call Delete NFTs
-        response = await blockCoApi.deleteNFTs('testUser2', [6])
+        response = await blockCoApi.deleteNFTs(owner, nftIds, ownerJwt)
         if(response.statusCode !== 200){
-            return res.json({"Error": response})
+            return res.status(400).json({"Error": response})
+        }else{
+            return res.status(200).json('NFTs deleted!')
         }
-    }else if(response.statusCode !== 200){
-        return res.json({"Error": response})
-    }
 
-    return res.json(response)
-    */
-    /********** NFT Deletion api call ends **********/
+    }else if(response.statusCode !== 200){
+        return res.status(400).json({"Error": response})
+    }else{
+        return res.status(200).json('NFTs deleted!')
+    }
 });
 
 
@@ -153,9 +137,15 @@ router.route('/:username/winner').get((req, res) => {
 
     var username = req.params.username
     User.findOne({account_id: username})
-        .then(user => res.json(user.game_info.isWinner))
-        .catch(err => res.status(400).json('Error: ' + err));
-
+        .populate('monsters')
+        .then(user => {
+            if(user.game_info.isWinner){
+                res.json({kingMonster: user.monsters[0]})
+            }else{
+                res.json({kingMonster: null})
+            }
+        })
+        .catch(err => res.json('Error: ' + err));
 });
 
 
@@ -197,12 +187,5 @@ router.route('/:username/timerdetails').put((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
-
-const refreshToken = async (username) => {
-  
-    const passcode = SECRET_PREFIX + username + SECRET_SUFFIX
-    const response = await blockCoApi.refreshToken(username, passcode)
-    return response
-}
 
 module.exports = router;
