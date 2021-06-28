@@ -174,6 +174,8 @@ export default function Profile(props){
         
         // User collected all the 10 monsters
         if(lockedMonstersList.length == 0){
+            // kill timer
+            setDelay(null)
 
             // King monster transfer starts
             setTransferStatus('Unlocking monster...')
