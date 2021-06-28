@@ -60,6 +60,7 @@ router.route('/:username/monsters').get(async (req, res) => {
         .populate('monsters')
         .then(user => res.json(user.monsters))
         .catch(err => res.status(400).json('Error: ' + err));
+    
     /** OR **/
 
     // OPTION 2: Directly querying blockchain
