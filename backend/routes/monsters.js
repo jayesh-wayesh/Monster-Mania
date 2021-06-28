@@ -1,27 +1,13 @@
-const router = require('express').Router();
-const Monster = require('../models/monster.model');
-const User = require('../models/user.model');
+const router = require('express').Router()
+const Monster = require('../models/monster.model')
+const User = require('../models/user.model')
 const blockCoApi = require('../blockco/api_calls')
-
-const SECRET_PREFIX=process.env.SECRET_PREFIX
-const SECRET_SUFFIX=process.env.SECRET_SUFFIX
+const Token = require('../helpers/token')
+const DEVELOPER_ACCOUNT=process.env.DEVELOPER_ACCOUNT
 const monsterNames = ["Birdy Boss","Casper Spray","Hit Woman","Aqua Coach","Thunder Kid","Mad Sauce","Octo Crush","Shady Stick","Sawft Ball","Hippie Puns","King Cyborg"]
-const monsterImages = [
-    "https://blush.design/api/download?shareUri=I-RI7TbzIOQP7-rc&c=Skin_0%7Efd8800&w=800&h=800&fm=png",
-    "https://blush.design/api/download?shareUri=EbvZIUvQiGIwT82T&c=Skin_0%7E00d2dc&w=800&h=800&fm=png",
-    "https://blush.design/api/download?shareUri=MetU3cmttp6SXjsH&c=Skin_0%7Eacff00&w=800&h=800&fm=png",
-    "https://blush.design/api/download?shareUri=IzJmjRnWbmhZp4d9&c=Skin_0%7E0099a3&w=800&h=800&fm=png",
-    "https://blush.design/api/download?shareUri=1m-Pb5NHc30PevgO&c=Skin_0%7E7c6bba&w=800&h=800&fm=png",
-    "https://blush.design/api/download?shareUri=1oZiY75RzrYnDy83&c=Skin_0%7Effcf00&w=800&h=800&fm=png",
-    "https://blush.design/api/download?shareUri=rcIg6q5bkeOg4dao&c=Skin_0%7E00d2dc&w=800&h=800&fm=png",
-    "https://blush.design/api/download?shareUri=NAmV5SxVJBTSJJ31&c=Skin_0%7Ef45675&w=800&h=800&fm=png",
-    "https://blush.design/api/download?shareUri=-yvhHgBFZudAzkzT&c=Skin_0%7Efd8800&w=800&h=800&fm=png",
-    "https://blush.design/api/download?shareUri=Nz2iPIPUFwjCjbe3&c=Skin_0%7Ef45675&w=800&h=800&fm=png",
-    "https://blush.design/api/download?shareUri=CAXReDx4hsb40oN4&c=Skin_0%7Eacff00&w=800&h=800&fm=png"
-]
 
 
-// Fetch all monsters
+// Fetch all Monsters NFTs
 router.route('/').get((req, res) => {
 
     Monster.find()
@@ -31,141 +17,146 @@ router.route('/').get((req, res) => {
 })
 
 
-// NFT Creation 
+// Create Monster NFT 
 router.route('/create').post(async (req,res) => {
 
-    /********** NFT Creation api call starts **********/
-    /*
-    const response = await blockCoApi.createNFTs(
-        'testUser5',
+    // Mint new NFTs to developer account
+    const monsterID = req.body.monsterID
+    const editions = req.body.editions
+    var response = await blockCoApi.createNFTs(
+        DEVELOPER_ACCOUNT,
         {
-            'name': req.body.monsterProperties.name,
-            'monster_id': req.body.monsterProperties.monsterID, 
-            'editions': req.body.editions,
+            'name': monsterNames[monsterID - 1],
+            'monster_id': monsterID, 
+            'editions': editions,
         }
     )
-
     if(response.statusCode !== 201){
         return res.json({"Error": response})
     }
-    
-    const nft_ids = response.body
-    return res.json(nft_ids)
-    */
-    /********** Account Creation api call ends **********/
-    
-    // Temporary workaround to create NFTs 
-    var editions = req.body.editions
-    console.log('editions')
-    console.log(req.body.editions)
-    var newMonstersArray = []
 
-    for(var i = 1; i <= editions; i++) {
+    // Store the IDs of these newly minted NFTs
+    const nft_ids = response.body.nft_ids
 
-        const newMonster = new Monster({
-            nft_id: Number(req.body.last_nft_id) + i,  // value added is temporary 
-            edition: i,  // value added is temporary 
-            media_id: req.body.monsterProperties.monsterID,
-            name: monsterNames[ req.body.monsterProperties.monsterID - 1 ],
-            content_url: monsterImages[ req.body.monsterProperties.monsterID - 1 ],
-        });
-        
-        //newMonstersArray.push(newMonster)
-        await newMonster.save()
-            .then(monster => {newMonstersArray.push(monster)})
-            .catch(err => res.status(400).json('Error: ' + err))
 
+    // Retrieve the info of all the NFTs in developer account
+    var response = await blockCoApi.retrieveNFT(DEVELOPER_ACCOUNT)
+    if(response.statusCode !== 200){
+        return res.json({"Error": response})
     }
-    
-    User.findOne({ account_id: 'dev'})
+
+    // Store the infos of all NFTs in developer account
+    const monsters = response.body.nft_infos
+
+
+    // Filter all the NFTs that are newly minted and update them in database
+    var newMonstersArray = []
+    if(monsters){
+
+        // Create a monster in database for each newly minted NFT
+        for (const monster of monsters) {
+            if(nft_ids.includes(monster.id)){
+                
+                var ipfsURL = monster.content_url
+                var imageURL = 'https://ipfs.io/ipfs/' + ipfsURL.replace("ipfs://", "")
+
+                const newMonster = new Monster({
+                    nft_id: monster.id,
+                    edition: monster.edition,
+                    media_id: JSON.parse(monster.developer_metadata).monster_id,
+                    name: JSON.parse(monster.developer_metadata).name,
+                    content_url: imageURL,
+                });
+
+                await newMonster.save()
+                    .then(monster => { newMonstersArray.push(monster) })
+                    .catch(err => res.json('Error: ' + err))
+            }
+        }
+    }
+    console.log('newMonstersArray : ', newMonstersArray)
+
+
+    // Update users database to add all new monsters 
+    User.findOne({ account_id: DEVELOPER_ACCOUNT })
         .then(user => {
             user.monsters = user.monsters.concat(newMonstersArray)
-            console.log(user)
 
             user.save()
-                .then(() => res.status(200).json('NFTs added to developer account '))
-                .catch(err => res.status(400).json('Error: ' + err));
+                .then(() => res.json('NFTs added to developer account '))
+                .catch(err => res.json('Error: ' + err));
         })
 })
 
 
-// NFT Transfer
+// Transfer Monster NFT
 router.route('/transfer').put(async (req, res) => {
-
-    const media_id = req.body.monsterID
+    
     var monsterToBeTransferred
+    const mediaID = req.body.monsterID
+    const recipient = req.body.recipient
+    const sender = DEVELOPER_ACCOUNT
 
-    // Remove from developer's account
-    await User.findOne({account_id: 'dev' })
+    // Find a monster in developer's account having `media_id` equal to requested `mediaID`
+    await User.findOne({ account_id: DEVELOPER_ACCOUNT })
         .populate('monsters')
         .then(user => {
 
-            var index = user.monsters.findIndex(monster => monster.media_id == media_id)
+            var index = user.monsters.findIndex(monster => monster.media_id == mediaID)
             monsterToBeTransferred = user.monsters[index]
-            user.monsters.splice(index, 1)
 
-            console.log('monsterToBeTransferred')
-            console.log(monsterToBeTransferred)
+            // Remove the monster from developer's collection
+            user.monsters.splice(index, 1)
 
             user.save()
                 .then(() => {console.log('monster removed from developer account!')})
-                .catch(err => res.status(400).json('Error: ' + err))
+                .catch(err => res.json('Error: ' + err))
         })
 
 
-    /********** NFT Transfer api call starts **********/
-    /*
-    var response = await blockCoApi.transferNFT('testUser1', 'testUser2', [6])
-    console.log(response)
+    var senderJwt = await Token.getUserJwt(sender)
+    const nft_ids = [monsterToBeTransferred.nft_id]
+
+    // Transfer the nft having `nft_id` equal to above found monster from sender to recipient
+    var response = await blockCoApi.transferNFT(sender, recipient, nft_ids, senderJwt)
+
+    // In case sender's jwt expires
     if(response.statusCode === 401){
-  
-      // call refresh token
-      response = await refreshToken('testUser1')
-      if(response.statusCode !== 201){
-        return res.json({"Error": response})
-      }
-      
-      // update JWT
-      process.env.testUser1_JWT = response.body.jwt
-  
-      // again call Transfer NFTs
-      response = await blockCoApi.transferNFT('testUser1', 'testUser2', [6])
-      if(response.statusCode !== 200){
-        return res.json({"Error": response})
-      }
+        console.log('Trying with new Token')
+
+        // call refresh token
+        response = await Token.refreshToken(sender)
+        if(response.statusCode !== 201){
+            return res.json({"Error": response})
+        }
+        
+        // update Token
+        senderJwt = response.body.jwt
+
+        // again call Transfer NFTs
+        response = await blockCoApi.transferNFT(sender, recipient, nft_ids, senderJwt)
+        if(response.statusCode !== 200){
+            return res.json({"Error": response})
+        }
   
     }else if(response.statusCode !== 200){
-      return res.json({"Error": response})
+        return res.json({"Error": response})
     }
-  
-    return res.json(response)
-    */
-    /********** NFT Transfer api call ends **********/
 
 
-    // Add to user's account
-    await User.findOne({ account_id: req.body.recipient })
+    // Add the monster user's collection
+    await User.findOne({ account_id: recipient })
         .then(user => {
             user.monsters.push(monsterToBeTransferred)
-            console.log('user')
-            console.log(user)
 
             user.save()
                 .then(() => {console.log('monster added to user account!')})
-                .catch(err => res.status(400).json('Error: ' + err))
+                .catch(err => res.json('Error: ' + err))
         })
 
-    res.status(200).json(monsterToBeTransferred)
+    return res.json(monsterToBeTransferred)
 
 });
-
-
-const refreshToken = async (username) => {
-  
-    const passcode = SECRET_PREFIX + username + SECRET_SUFFIX
-    const response = await blockCoApi.refreshToken(username, passcode)
-    return response
-}
 
 
 module.exports = router;
