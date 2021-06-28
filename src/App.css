@@ -52,15 +52,14 @@ span{
 }
 
 section{
-  height: auto;
   min-height: 400px;
+  max-height: 550px;
   background-color: #F7F7F7;
   padding-bottom: 2%;
   display: flex;
   flex-direction: column;
   width: 100%;
   color: #191919;
-
 }
 
 .section-dark{
@@ -109,6 +108,7 @@ section{
 
 section .container {
   max-width: 80%;
+  max-height: 379px;
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
@@ -116,7 +116,7 @@ section .container {
   justify-content: flex-start;
   align-items:baseline;
   align-self: center;
-  overflow: auto;
+  overflow-x: auto;
 }
 
 .container-desc {
@@ -133,34 +133,83 @@ section .container {
   justify-content: flex-end;
 }
 
-.media {
-  height: 200;
-  width: 200;
-  align-self: 'center';
-  padding-top: '20%';
-  padding-bottom: '5%';
-}
-
-.media_locked {
-  opacity: 0.2;
-  color: '#0025FF';
-  /* paddingTop: '50%', */
-}
-
 p{
   font-size: 20px;
+  color: #808080;
 }
 
-.container-x{
-  
+.account{
   position: absolute;
   right: 20px;
   top: 10px;
   z-index: 10;
   font-size: 20px;
+}
 
+.account .username {
   background: -webkit-linear-gradient(left, #f1f1f1, #808080);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+  font-size: 16px;
+
+  margin-bottom: 10px;
+}
+
+.account .logout {
+    border-color: #600083;
+}
+
+.account .logout:hover {
+    border-color: #cbb4d4;
+}
+
+.login{
+    background-image: linear-gradient(to right, #383838, #000);
+}
+
+.login:hover{
+    background-image: linear-gradient(to right, #494949, #191919);
+}
+
+/** Monster Card **/
+.card {
+  height: 300px;
+  max-height: 300px;
+  min-width: 300px;
+  margin: 20px;
+}
+
+.media {
+  max-height: 200px;
+  max-Width: 200px;
+  align-self: 'center';
+  padding-top: 20px;
+}
+
+.media_locked {
+  max-height: 200px;
+  max-Width: 200px;
+  align-self: 'center';
+  padding-top: 20px;
+  opacity: 0.5;
+  color: '#0025FF';
+  /* color: '#000'; */
+  /* filter: blur(5px) grayscale(100%); */
+  /* filter: grayscale(100%); */
+
+  /* color: linear-gradient(to right, #40E0D0, #FF8C00,#FF0080); */
+  
+}
+
+.avatar {
+  color: '#fff';
+  margin-left: 245px;
+  margin-top: -55px;
+  padding: 2px;
+  background-image: linear-gradient(to right bottom, #600083, #cbb4d4);
+}
+
+.icon{
+  align-self: 'center';
 }
