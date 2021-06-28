@@ -55,7 +55,14 @@ router.route('/:username/monsters').get(async (req, res) => {
 
     // Retrieve info of all the NFTs owned by user
     
-    // OPTION 1: Directly querying blockchain
+    // OPTION 1: Fetching from local database
+    User.findOne({account_id: username})
+        .populate('monsters')
+        .then(user => res.json(user.monsters))
+        .catch(err => res.status(400).json('Error: ' + err));
+    /** OR **/
+
+    // OPTION 2: Directly querying blockchain
     /*
     const response = await blockCoApi.retrieveNFT(username)
     if(response.statusCode !== 200){
@@ -66,13 +73,11 @@ router.route('/:username/monsters').get(async (req, res) => {
     return res.json(monsters)
     */
 
-    /** OR **/
-    
-    // OPTION 2: Fetching from local database
-    User.findOne({account_id: username})
-        .populate('monsters')
-        .then(user => res.json(user.monsters))
-        .catch(err => res.status(400).json('Error: ' + err));
+    /**
+     *   @NOTE 
+     *   Currently UI is configured according to output of `OPTION 1`
+     *   In case you want to use `OPTION 2` then you'll need to make some changes in `hooks/retrieve-monsters.js`
+     */
 
 });
 
