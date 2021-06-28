@@ -14,6 +14,7 @@ export default function Account(props) {
         if(localStorage.getItem('username')){
             var currentUser = localStorage.getItem('username')
             props.setUsername(currentUser)
+            props.setOldUser(true)
         }
     }, []);
 
