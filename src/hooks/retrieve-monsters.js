@@ -7,11 +7,15 @@ export default async function RetrieveMonsters(props){
     var updatedCollection = new Array(12).fill(0) 
     var response = []
 
-    var editionFlag = false
-    var updatedMonsterEditionArray = []
-    if( props.monsterEditionArray ){
-        editionFlag = true
-        updatedMonsterEditionArray = new Array(12).fill(0)
+    var monsterPropsFlag = false
+    var updatedMonsterPropsArray = []
+    if( props.monsterPropsArray ){
+        monsterPropsFlag = true
+        updatedMonsterPropsArray = new Array(12).fill({
+            name: null, 
+            edition: '0', 
+            imageUrl: null
+        })
     }
 
     await axios.get('http://localhost:5000/users/' + props.username + '/monsters') 
@@ -20,12 +24,19 @@ export default async function RetrieveMonsters(props){
 
             monsters.map(monster => {
                 updatedCollection[ monster.media_id ]++
-                if(editionFlag) updatedMonsterEditionArray[ monster.media_id ] = monster.edition
+                if(monsterPropsFlag){ 
+                    updatedMonsterPropsArray[ monster.media_id ] = {
+                        name: monster.name, 
+                        edition: monster.edition, 
+                        imageUrl: monster.content_url
+                    }
+                }
             })
              
             response.push(updatedCollection)
-            if(editionFlag) response.push(updatedMonsterEditionArray)
+            if(monsterPropsFlag) response.push(updatedMonsterPropsArray)
         })
+        .catch(err => console.log('⚠️ Error : ' + err))
         
     return response
 }
