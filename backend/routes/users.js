@@ -53,7 +53,7 @@ router.route('/:username/monsters').get(async (req, res) => {
   
     var username = req.params.username
 
-    // Retrieval info of all the NFTs owned by user
+    // Retrieve info of all the NFTs owned by user
     
     // OPTION 1: Directly querying blockchain
     /*
