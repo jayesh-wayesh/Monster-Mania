@@ -17,7 +17,7 @@ export const updateTimeOfLatestDrop = async (username) => {
 
 }
 
-
+// Get time left in next Drop for old user
 export const getNewTimerValue = async (username, NFT_DROP_INTERVAL) => {
 
     var today = new Date()
@@ -28,10 +28,10 @@ export const getNewTimerValue = async (username, NFT_DROP_INTERVAL) => {
     var timeOfLastNFTDropInSecs
 
     await axios.get('http://localhost:5000/users/' + username + '/timerdetails')
-      .then(res => {
-        dateOfLastNFTDrop = res.data.date
-        timeOfLastNFTDropInSecs = res.data.time
-      })
+        .then(res => {
+            dateOfLastNFTDrop = res.data.date
+            timeOfLastNFTDropInSecs = res.data.time
+    })
 
     var differenceInDays = todaysDateInNumber - dateOfLastNFTDrop
     var differenceInTime = currentTimeInSecs - timeOfLastNFTDropInSecs
@@ -49,18 +49,26 @@ export const getNewTimerValue = async (username, NFT_DROP_INTERVAL) => {
     return newTimerValue
 }
 
-
+// Update winner in database
 export const updateWinner = async (username) => {
 
     await axios.put('http://localhost:5000/users/' + username + '/winner')
         .then(res => {console.log(res)} )
 }
 
-
+// Check if current user is winner
 export const isWinner = async (username) => {
 
     return await axios.get('http://localhost:5000/users/' + username + '/winner')
-        .then(res => res.data)
+        .then(res => res.data.kingMonster)
+}
+
+
+export const getRandomMonster = () => {
+    const min = 1;
+    const max = 10;
+    const mediaID =  min + Math.floor(Math.random() * (max - min));
+    return mediaID;
 }
 
 
@@ -68,3 +76,4 @@ export const sleep = (ms) => {
     console.log('sleep')
     return new Promise(resolve => setTimeout(resolve, ms));
 }
+
