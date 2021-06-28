@@ -9,7 +9,7 @@ const DEVELOPER_ID=Number(process.env.DEVELOPER_ID)
 const SERVER_NAME=process.env.SERVER_NAME
 
 
-// ✅ Tested
+// 🅱️ BlockCo's Create Account API 
 function createAccount(account_id, passcode){
    
     var data = {
@@ -41,7 +41,7 @@ function createAccount(account_id, passcode){
 }
 
 
-// ✅ Tested 
+// 🅱️ BlockCo's Create NFT API 
 function createNFTs(recipient_account_id, monster_props){
     
     var form = new FormData()
@@ -81,9 +81,8 @@ function createNFTs(recipient_account_id, monster_props){
 }
 
 
-// ✅ Tested 
-// ⚠️ PENDING: sender's jwt
-function transferNFT(sender_account_id, recipient_account_id, nft_ids){
+// 🅱️ BlockCo's Transfer NFT API 
+function transferNFT(sender_account_id, recipient_account_id, nft_ids, sender_jwt){
 
     var data = {
         'developer_id': DEVELOPER_ID,     
@@ -92,13 +91,12 @@ function transferNFT(sender_account_id, recipient_account_id, nft_ids){
         'nft_ids': nft_ids,
     }
         
-    var jwt = process.env.testUser1_JWT
     var options = {
         uri: BASE_URL + '/api/v1/nfts',
         body: JSON.stringify(data),
         method: 'PUT',
         headers: {
-            'Authorization': 'Bearer ' + jwt,               // sender's JWT.
+            'Authorization': 'Bearer ' + sender_jwt,               // sender's JWT.
             'Content-Type': 'application/json'
         }
     }
@@ -115,7 +113,7 @@ function transferNFT(sender_account_id, recipient_account_id, nft_ids){
 }
 
 
-// ✅ Tested
+// 🅱️ BlockCo's Retrieve NFTs API 
 function retrieveNFT(owner_account_id){
 
     var data = {
@@ -146,8 +144,8 @@ function retrieveNFT(owner_account_id){
 }
 
 
-// ✅ Tested
-function deleteNFTs(owner_account_id, nft_ids){
+// 🅱️ BlockCo's Delete NFTs API 
+function deleteNFTs(owner_account_id, nft_ids, owner_jwt){
 
     var data = {
         'developer_id': DEVELOPER_ID,     
@@ -155,13 +153,12 @@ function deleteNFTs(owner_account_id, nft_ids){
         'nft_ids': nft_ids,   
     }
   
-    var jwt = process.env.testUser2_JWT
     var options = {
         uri: BASE_URL + '/api/v1/nfts',
         body: JSON.stringify(data),
         method: 'DELETE',
         headers: {
-            'Authorization': 'Bearer ' + jwt,               // sender's JWT.
+            'Authorization': 'Bearer ' + owner_jwt,               // sender's JWT.
             'Content-Type': 'application/json'
         }
     }
@@ -178,7 +175,7 @@ function deleteNFTs(owner_account_id, nft_ids){
 }
 
 
-// ✅ Tested 
+// 🅱️ BlockCo's Refresh token API 
 function refreshToken(account_id, passcode) {
 
     var data = {
@@ -210,6 +207,7 @@ function refreshToken(account_id, passcode) {
 }
 
 
+// Creating developer JWT signed by private key 
 function generateAccessToken() {
   
     var DeveloperClaims = {
@@ -219,7 +217,6 @@ function generateAccessToken() {
     }
   
     const buffer = Buffer.from(DEVELOPER_PRIVATE_KEY, 'base64');
-  
     return jwt.sign(DeveloperClaims, buffer)
 }
 
