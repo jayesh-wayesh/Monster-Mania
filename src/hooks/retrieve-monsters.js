@@ -1,42 +1,45 @@
 import axios from 'axios';
 
 export default async function RetrieveMonsters(props){
+
+    //const []
     
     console.log('Inside Retrieve Monsters Function')
 
-    var updatedCollection = new Array(12).fill(0) 
-    var response = []
+    var updatedMonsterCollection = new Array(12).fill({
+        name: null, 
+        editions: null, 
+        imageUrl: null
+    })
 
-    var monsterPropsFlag = false
-    var updatedMonsterPropsArray = []
-    if( props.monsterPropsArray ){
-        monsterPropsFlag = true
-        updatedMonsterPropsArray = new Array(12).fill({
-            name: null, 
-            edition: '0', 
-            imageUrl: null
-        })
-    }
+    console.log("---0----- : ", updatedMonsterCollection)
 
     await axios.get('http://localhost:5000/users/' + props.username + '/monsters') 
         .then(res => res.data)
         .then(monsters => {
+            console.log("monsters : ", monsters)
 
             monsters.map(monster => {
-                updatedCollection[ monster.media_id ]++
-                if(monsterPropsFlag){ 
-                    updatedMonsterPropsArray[ monster.media_id ] = {
-                        name: monster.name, 
-                        edition: monster.edition, 
-                        imageUrl: monster.content_url
-                    }
+                console.log("2 before retrieval : ", updatedMonsterCollection)
+                
+                var updatedEditionsArray = []
+                if( updatedMonsterCollection[monster.media_id].editions ){
+                    updatedEditionsArray = updatedMonsterCollection[monster.media_id].editions
                 }
+
+                updatedEditionsArray.push(monster.edition)
+                var monsterInfo = {
+                    name: monster.name,
+                    editions: updatedEditionsArray, 
+                    imageUrl: monster.content_url 
+                }
+                updatedMonsterCollection[monster.media_id] = monsterInfo
+
+                console.log("3 after retrieval : ", updatedMonsterCollection)
             })
-             
-            response.push(updatedCollection)
-            if(monsterPropsFlag) response.push(updatedMonsterPropsArray)
+
         })
         .catch(err => console.log('⚠️ Error : ' + err))
         
-    return response
+    return updatedMonsterCollection
 }

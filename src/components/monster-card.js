@@ -4,7 +4,7 @@ import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import Avatar from '@material-ui/core/Avatar';
 import LockRoundedIcon from '@material-ui/icons/LockRounded';
-import {getImage, getName} from '../media'
+import {getImage, getName, getEmoji} from '../media'
 import '../App.css'
 
 
@@ -29,14 +29,15 @@ export default function MonsterCard(props) {
 					}
 				</Typography>
 			</CardContent>
-			{(props.monsterCount > 0)
+			{(props.monsterProps && (props.monsterProps.edition)) 
 				?
-					<Avatar aria-label="recipe" className="avatar">
-						{(props.currentMonster == 11) 
-						? <>👑</> 
-						: <>+{props.monsterCount}</>
-						}
-					</Avatar>
+				    <>
+					{(props.currentMonster == 11) &&
+						<Avatar aria-label="recipe" className="avatar">
+							{getEmoji(props.currentMonster)}
+						</Avatar>
+					}
+					</>
 				:
 					<Avatar aria-label="recipe" className="avatar">
 						<LockRoundedIcon/>

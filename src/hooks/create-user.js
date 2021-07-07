@@ -20,21 +20,22 @@ export default function CreateUser(props) {
 		}
 
 		await axios.get('http://localhost:5000/users/')
-		.then(res => {  
-			var userExist = res.data.find(user => user === username)
-			return userExist
-		})
-		.then(userExist => {
-			if(userExist === undefined) {
-				axios.post('http://localhost:5000/users/add', newUser)
-					.then(res => console.log(res.data))
-			}else{
-				props.setOldUser(true)
-			}
-			props.setUsername(username)
-		})
-		
-		localStorage.setItem("username", username)
+            .then(res => {  
+                var userExist = res.data.find(user => user === username)
+                return userExist
+            })
+            .then(async (userExist) => {
+                if(userExist === undefined) {
+                    await axios.post('http://localhost:5000/users/add', newUser)
+                        .then(res => console.log(res.data))
+                }else{
+                    props.setOldUser(true)
+                }
+
+                props.setUsername(username)
+                localStorage.setItem("username", username)
+            })
+            .catch(err => console.log('⚠️ Error : ' + err))
 	}
 
 	return (

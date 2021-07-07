@@ -11,20 +11,35 @@ const NFT_DROP_INTERVAL = 60
 
 export default function Profile(props){
 
-    const [collection, setCollection] = useState(new Array(12).fill(0))
+    // const [collection, setCollection] = useState(new Array(12).fill(0))
     const [lockedMonsters, setLockedMonsters] = useState()
     const [unlockedMonsters, setUnlockedMonsters] = useState()
     const [delay, setDelay] = useState()
     const [transferStatus, setTransferStatus ] = useState()
     const [newMonster, setNewMonster] = useState()
     const [winner, setWinner] = useState(false)
-    const [monsterPropsArray, setMonsterPropsArray] = useState(
+    // const [monsterPropsArray, setMonsterPropsArray] = useState(
+    //     new Array(12).fill({
+    //         name: null, 
+    //         edition: '0', 
+    //         imageUrl: null
+    //     }
+    // ))
+
+    const [monsterCollection, setMonsterCollection]  = useState(
         new Array(12).fill({
             name: null, 
-            edition: '0', 
+            editions: null, 
             imageUrl: null
-        }
-    ))
+        })
+    )
+
+    const [currentMonster, setCurrentMonster] = useState({
+        name: null, 
+        edition: 0, 
+        imageUrl: null
+    })
+
     const [timerCount, setTimerCount] = useState()
     const [startGame, setStartGame] = useState(false)
     const [dropOnLogin, setDropOnLogin] = useState(true)
@@ -33,31 +48,27 @@ export default function Profile(props){
     //     instead of using : current_monster  = random()
     const [currentMediaID, setCurrentMediaID] = useState(1)
 
+    // useEffect(() => {
+    //     console.log('0.0 monsterCollection : ', monsterCollection)
+
+    // }, [monsterCollection])
+
     useEffect(async () => {
+
+        console.log('0 monsterCollection : ', monsterCollection)
 
         if(props.oldUser){
 
             const kingMonster = await isWinner( props.username )
             if(kingMonster){
-                setTransferStatus(1)
+                setTransferStatus('Loading monster...')
                 setWinner(true)
 
-                // update collection
-                setCollection(() => {
-                    var updatedCollection = collection
-                    updatedCollection[11] = 1
-                    return updatedCollection
-                })
-
                 // update king monster props
-                setMonsterPropsArray(() => {
-                    var updatedMonsterPropsArray = monsterPropsArray
-                    updatedMonsterPropsArray[11] = {
-                        name: kingMonster.name,
-                        edition: kingMonster.edition,
-                        imageUrl: kingMonster.content_url
-                    }
-                    return updatedMonsterPropsArray
+                setCurrentMonster({
+                    name: kingMonster.name,
+                    edition: kingMonster.edition,
+                    imageUrl: kingMonster.content_url
                 })
 
                 setTransferStatus(null)
@@ -73,55 +84,54 @@ export default function Profile(props){
             setTimerCount( NFT_DROP_INTERVAL )
             setStartGame(true)
         }
-
     }, []);
     
 
     useEffect(async () => {
 
         if(startGame && !delay && !winner){
-            
-            var updatedMonsterPropsArray = [] 
-            // var updatedMonsterEditionArray = [] 
-            var updatedCollection = []
-            var response = []
+
+            var updatedMonsterCollection = []
 
             // In case user is an existing one and has just entered the game 
             if(dropOnLogin){
-                
+                console.log('1')
                 // Next NFT drop
                 var monsterID = currentMediaID
                 setCurrentMediaID(currentMediaID + 1)
                 setTransferStatus('Unlocking monster...')
                 setNewMonster(monsterID)
 
+                console.log('monsterCollection b: ', monsterCollection)
+
                 // update monster props for transferred monster
-                updatedMonsterPropsArray = await TransferMonster({username: props.username, monsterID: monsterID, monsterPropsArray: monsterPropsArray })
-                setMonsterPropsArray(updatedMonsterPropsArray) 
+                updatedMonsterCollection = await TransferMonster({username: props.username, monsterID: monsterID, setCurrentMonster: setCurrentMonster, monsterCollection: monsterCollection })
+                setMonsterCollection(updatedMonsterCollection)
+
+                console.log('monsterCollection a: ', monsterCollection)
+                console.log('updatedMonsterCollection: ', updatedMonsterCollection)
+
 
                 // update database
                 await updateTimeOfLatestDrop(props.username)
             }else{
+                console.log('2')
+
                 setDropOnLogin(true)
             }
             
             // In case user is an old one, we need to initialise edition array for existing monsters once 
-            // along with updated monster collection   
+            // along with updated monster collection 
             if( props.oldUser ){
+                console.log('3')
 
-                response = await RetrieveMonsters({ username: props.username, monsterPropsArray: monsterPropsArray })
-                updatedMonsterPropsArray = response[1]
-                setMonsterPropsArray(updatedMonsterPropsArray) 
-
+                updatedMonsterCollection = await RetrieveMonsters({ username: props.username })
+                setMonsterCollection(updatedMonsterCollection)
                 props.setOldUser(false)
-            }else{
-                response = await RetrieveMonsters({ username: props.username })
             }
-            updatedCollection = response[0]
-            setCollection(updatedCollection)
 
             // update UI
-            updateDisplay(updatedCollection, updatedMonsterPropsArray)
+            updateDisplay(updatedMonsterCollection)
 
             // King monster transfer complete
             setTransferStatus(null)
@@ -131,32 +141,52 @@ export default function Profile(props){
         }
       }, [delay, startGame]);
 
-    const updateDisplay = (monsterList, updatedMonsterPropsArray) => {
-        
+    const updateDisplay = (updatedMonsterCollection) => {
+        // console.log('4')
+
+        // console.log('updatedMonsterCollection : ', updatedMonsterCollection)
         var unlockedMonstersList = []
         var lockedMonstersList = []
 
-        monsterList.forEach(
-            (monsterCount,monsterId,map) => {
+        updatedMonsterCollection.forEach(
+            (monster,monsterId,map) => {
 
-                var monsterProps = updatedMonsterPropsArray[ monsterId ]
-                
-                if(monsterCount > 0){
-                    unlockedMonstersList.push(          
-                        <MonsterCard 
-                            currentMonster={monsterId}
-                            monsterCount={monsterCount}
-                            monsterProps={monsterProps}
-                        />
-                    )
-                }else if(monsterId !== 0 && monsterId !== 11){
-                    lockedMonstersList.push(          
-                        <MonsterCard 
-                            currentMonster={monsterId}
-                            monsterCount={monsterCount}
-                            monsterProps={monsterProps}
-                        />
-                    )
+                if( monsterId > 0 && monsterId < 11 ){
+                    if( monster.editions ){
+
+                        monster.editions.forEach(
+                            edition => {
+
+                                var monsterProps = {
+                                    name: monster.name,
+                                    edition: edition,
+                                    imageUrl: monster.imageUrl
+                                }
+    
+                                console.log('monsterprops : ', monsterProps)
+                                unlockedMonstersList.push(          
+                                    <MonsterCard 
+                                        currentMonster={monsterId}
+                                        monsterProps={monsterProps}
+                                    />
+                                )
+                            }
+                        )
+                    }else{
+
+                        var monsterProps = {
+                            name: monster.name,
+                            edition: null,
+                            imageUrl: monster.imageUrl
+                        }
+
+                        lockedMonstersList.push(          
+                            <MonsterCard 
+                                currentMonster={monsterId}
+                                monsterProps={props}
+                            />
+                        )
+                    }
                 }
             }
         )
@@ -172,6 +202,9 @@ export default function Profile(props){
 
     const checkWinner = async (lockedMonstersList) => {
         
+        console.log('lockedMonsters : ', lockedMonsters)
+        console.log('unlockedMonsters : ', unlockedMonsters)
+
         // User collected all the 10 monsters
         if(lockedMonstersList.length == 0){
             // kill timer
@@ -184,8 +217,8 @@ export default function Profile(props){
             await DeleteMonster({username: props.username })
 
             // transfer King monster
-            const updatedMonsterPropsArray = await TransferMonster({username: props.username, monsterID: 11, monsterPropsArray: monsterPropsArray })
-            setMonsterPropsArray( updatedMonsterPropsArray ) 
+            await TransferMonster({username: props.username, monsterID: 11, setCurrentMonster: setCurrentMonster })
+
 
             // King monster transfer complete
             setTransferStatus(null)
@@ -211,8 +244,7 @@ export default function Profile(props){
                     <div className="container">
                         <MonsterCard 
                             currentMonster={11}
-                            monsterCount={transferStatus ? 0 : 1}
-                            monsterProps={transferStatus ? null : monsterPropsArray[11]}
+                            monsterProps={transferStatus ? null : currentMonster}
                         />
                     </div>
                 </section>
@@ -228,15 +260,14 @@ export default function Profile(props){
                             <div className="container">
                                 <MonsterCard 
                                     currentMonster={newMonster}
-                                    monsterCount={transferStatus ? 0 : collection[newMonster]}
-                                    monsterProps={transferStatus ? null : monsterPropsArray[newMonster]}
+                                    monsterProps={transferStatus ? null : currentMonster}
                                 />
                             </div>
                         </section>
                     }
                     <section className="section">
                         <h2>Monsters Collected</h2>
-                        {collection &&
+                        {monsterCollection &&
                             <div className="container">
                                 <>{unlockedMonsters}</>
                             </div>
@@ -249,7 +280,7 @@ export default function Profile(props){
                     />
                     <section className="section">
                         <h2>Missing Monsters</h2>
-                        {collection &&
+                        {monsterCollection &&
                             <div className="container">
                                 <>{lockedMonsters}</>
                             </div>

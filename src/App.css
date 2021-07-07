@@ -32,6 +32,12 @@ span{
     color: #cbb4d4;
 }
 
+span a{
+    display: inline;
+    color: #cbb4d4;
+    text-decoration: unset;
+}
+
 section{
     min-height: 400px;
     background-color: #F7F7F7;

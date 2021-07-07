@@ -18,10 +18,29 @@ export default function Timer(props) {
         let divisor_for_seconds = divisor_for_minutes % 60;
         let seconds = Math.ceil(divisor_for_seconds);
 
+        var h,m,s
+        if(hours < 10){
+            h = '0' + hours.toString()
+        }else{
+            h = hours.toString() 
+        }
+
+        if(minutes < 10){
+            m = '0' + minutes.toString()
+        }else{
+            m = minutes.toString()
+        }
+        
+        if(seconds < 10){
+            s = '0' + seconds.toString()
+        }else{
+            s = seconds.toString()
+        }
+
         let obj = {
-			h: hours,
-			m: minutes,
-			s: seconds
+			h: h,
+			m: m,
+			s: s
         };
         return obj;
     };
@@ -42,8 +61,8 @@ export default function Timer(props) {
 
     return (
         <section className="section-dark">
-			<h2>Time left until next Drop</h2>
-			{t.s
+			<h2>Time Left until Next Award</h2>
+			{t
 				? <h1>{t.h}:{t.m}:{t.s}</h1>
 				: <h1>00:00:00</h1>
 			}
