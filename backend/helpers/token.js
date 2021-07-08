@@ -1,11 +1,21 @@
 const User = require('../models/user.model');
 const blockCoApi = require('../blockco/api_calls')
-const SECRET_PREFIX=process.env.SECRET_PREFIX
-const SECRET_SUFFIX=process.env.SECRET_SUFFIX
+const crypto = require("crypto");
+
+
+// create a new passcode 
+async function createPasscode(){
+
+    return crypto.randomBytes(20).toString('hex');
+}
 
 // Return passcode corresponding to a user's username
-function getPasscode(username){
-    return SECRET_PREFIX + username + SECRET_SUFFIX
+async function getPasscode(username){
+
+    const passcode = await User.findOne({ account_id: username })
+        .then(user => user.passcode)
+
+    return passcode
 }
 
 // Find jwt token of the user in database
@@ -40,4 +50,4 @@ async function updateUserJwt(username, newJwt) {
 } 
 
 
-module.exports = { getUserJwt, refreshToken, updateUserJwt, getPasscode };
+module.exports = { getUserJwt, refreshToken, updateUserJwt, getPasscode, createPasscode };

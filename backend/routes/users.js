@@ -23,7 +23,7 @@ router.route('/').get((req, res) => {
 router.route('/add').post(async (req, res) => {
    
     const newAccountUsername = req.body.username
-    var newAccountPasscode = Token.getPasscode(newAccountUsername)
+    var newAccountPasscode = Token.createPasscode()
   
     // Create a new account on blockchain using username and passcode
     const response = await blockCoApi.createAccount(newAccountUsername, newAccountPasscode)

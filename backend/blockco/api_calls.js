@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken')
 var FormData = require('form-data')
 var fs = require('fs')
 
-const BASE_URL=process.env.BASE_URL 
+const BLOCKCO_API_URL=process.env.BLOCKCO_API_URL 
 const DEVELOPER_PRIVATE_KEY=process.env.DEVELOPER_PRIVATE_KEY
 const DEVELOPER_ID=Number(process.env.DEVELOPER_ID)
 const SERVER_NAME=process.env.SERVER_NAME
@@ -20,7 +20,7 @@ function createAccount(account_id, passcode){
       
     var jwt = generateAccessToken()
     var options = {
-        uri: BASE_URL + '/api/v1/accounts',
+        uri: BLOCKCO_API_URL + '/api/v1/accounts',
         body: JSON.stringify(data),
         method: 'POST',
         headers: {
@@ -60,7 +60,7 @@ function createNFTs(recipient_account_id, monster_props){
     var jwt = generateAccessToken()
     var bound = form.getBoundary()
     var options = {
-        uri: BASE_URL + '/api/v1/nfts',
+        uri: BLOCKCO_API_URL + '/api/v1/nfts',
         body: form,
         method: 'POST',
         headers: {
@@ -92,7 +92,7 @@ function transferNFT(sender_account_id, recipient_account_id, nft_ids, sender_jw
     }
         
     var options = {
-        uri: BASE_URL + '/api/v1/nfts',
+        uri: BLOCKCO_API_URL + '/api/v1/nfts',
         body: JSON.stringify(data),
         method: 'PUT',
         headers: {
@@ -123,7 +123,7 @@ function retrieveNFT(owner_account_id){
             
     var jwt = generateAccessToken()
     var options = {
-        uri: BASE_URL + '/api/v1/nfts',
+        uri: BLOCKCO_API_URL + '/api/v1/nfts',
         body: JSON.stringify(data),
         method: 'GET',
         headers: {
@@ -154,7 +154,7 @@ function deleteNFTs(owner_account_id, nft_ids, owner_jwt){
     }
   
     var options = {
-        uri: BASE_URL + '/api/v1/nfts',
+        uri: BLOCKCO_API_URL + '/api/v1/nfts',
         body: JSON.stringify(data),
         method: 'DELETE',
         headers: {
@@ -186,7 +186,7 @@ function refreshToken(account_id, passcode) {
     
     var jwt = generateAccessToken()
     var options = {
-      uri: BASE_URL + '/api/v1/tokens',
+      uri: BLOCKCO_API_URL + '/api/v1/tokens',
       body: JSON.stringify(data),
       method: 'POST',
       headers: {
