@@ -4,7 +4,7 @@ const crypto = require("crypto");
 
 
 // create a new passcode 
-async function createPasscode(){
+function createPasscode(){
 
     return crypto.randomBytes(20).toString('hex');
 }
