@@ -23,7 +23,8 @@ router.route('/').get((req, res) => {
 router.route('/add').post(async (req, res) => {
    
     const newAccountUsername = req.body.username
-    var newAccountPasscode = Token.createPasscode()
+    const newAccountPassword = req.body.password
+    const newAccountPasscode = Token.createPasscode()
   
     // Create a new account on blockchain using username and passcode
     const response = await blockCoApi.createAccount(newAccountUsername, newAccountPasscode)
@@ -35,6 +36,7 @@ router.route('/add').post(async (req, res) => {
     // Create a user object and update in database
     const newUser = new User({
         account_id: newAccountUsername,
+        password: newAccountPassword,
         passcode: newAccountPasscode,
         jwt: newAccount.jwt,   
         blockchain: newAccount.blockchain,
@@ -45,6 +47,23 @@ router.route('/add').post(async (req, res) => {
     await newUser.save()
         .then((user) => res.json('User ' + user.account_id + ' added!'))
         .catch(err => res.status(400).json('Error: ' + err))
+});
+
+
+// Authenticate current user
+router.route('/:username/authenticate').put(async (req, res) => {
+
+    var username = req.params.username
+    var password = req.body.password
+    User.findOne({account_id: username})
+        .then(user => {
+            if(user.password == password){
+                res.json({authenticate: true})
+            }else{
+                res.json({authenticate: false})
+            }
+        })
+        .catch(err => res.json({authenticate: undefined}));
 });
 
 

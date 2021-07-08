@@ -5,6 +5,7 @@ let Monster = require('./monster.model');
 
 const userSchema = new Schema({
     account_id: {type: String, required: true, unique: true}, 
+    password: {type: String, required: true}, 
     passcode: {type: String, required: true},
     blockchain: {type: String, required: true},
     blockchainAddress: {type: String, required: true},
@@ -20,7 +21,7 @@ const userSchema = new Schema({
 });
 
 var secret = process.env.ENCRYPTION_SECRET;
-userSchema.plugin(encrypt, { secret: secret, encryptedFields: ['passcode'] });
+userSchema.plugin(encrypt, { secret: secret, encryptedFields: ['passcode','password'] });
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;
