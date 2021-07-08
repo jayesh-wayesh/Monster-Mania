@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react"
-const NFT_DROP_INTERVAL = 60
+import { NEW_AWARD_INTERVAL } from "../hooks/update-game-status"
 
 
 export default function Timer(props) {
@@ -55,7 +55,7 @@ export default function Timer(props) {
 
             if (count === 0) {
                props.setDelay(null);
-               setCount(NFT_DROP_INTERVAL)
+               setCount(NEW_AWARD_INTERVAL)
             }
     }, props.delay);
 

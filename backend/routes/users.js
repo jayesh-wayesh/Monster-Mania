@@ -169,24 +169,24 @@ router.route('/:username/winner').put((req, res) => {
 });
 
 
-// Get the time of last NFT drop
+// Get the time of last NFT award
 router.route('/:username/timerdetails').get((req, res) => {
 
     var username = req.params.username
     User.findOne({account_id: username})
-        .then(user => res.json(user.game_info.last_nft_drop))
+        .then(user => res.json(user.game_info.last_nft_award))
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
 
-// Set the time of latest NFT drop
+// Set the time of latest NFT award
 router.route('/:username/timerdetails').put((req, res) => {
 
     var username = req.params.username
     User.findOne({account_id: username})
         .then(user => {
-            user.game_info.last_nft_drop.date = req.body.date
-            user.game_info.last_nft_drop.time = req.body.time
+            user.game_info.last_nft_award.date = req.body.date
+            user.game_info.last_nft_award.time = req.body.time
             user.save()
         })
         .then(() =>  res.json('Game timer details updated for user ' + username))

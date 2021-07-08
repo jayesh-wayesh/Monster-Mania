@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-// Update time of the latest NFT drop in database
+export const NEW_AWARD_INTERVAL = 60
+
+// Update time of the latest NFT award in database
 export const updateTimeOfLatestDrop = async (username) => {
 
     var today = new Date()
@@ -17,8 +19,8 @@ export const updateTimeOfLatestDrop = async (username) => {
 
 }
 
-// Get time left in next Drop for old user
-export const getNewTimerValue = async (username, NFT_DROP_INTERVAL) => {
+// Get time left in next award for old user
+export const getNewTimerValue = async (username, NEW_AWARD_INTERVAL) => {
 
     var today = new Date()
     var todaysDateInNumber = Number((today.getFullYear() * 10000) + (today.getMonth() + 1) * 100 + today.getDate())
@@ -38,11 +40,11 @@ export const getNewTimerValue = async (username, NFT_DROP_INTERVAL) => {
     var newTimerValue 
 
     if( differenceInDays > 0 ){
-        newTimerValue = NFT_DROP_INTERVAL
-    } else if( differenceInTime >= NFT_DROP_INTERVAL ){
-        newTimerValue = NFT_DROP_INTERVAL
+        newTimerValue = NEW_AWARD_INTERVAL
+    } else if( differenceInTime >= NEW_AWARD_INTERVAL ){
+        newTimerValue = NEW_AWARD_INTERVAL
     }else{
-        var secsLeft = NFT_DROP_INTERVAL - differenceInTime
+        var secsLeft = NEW_AWARD_INTERVAL - differenceInTime
         newTimerValue = secsLeft
     }
 

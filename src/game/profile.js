@@ -4,9 +4,7 @@ import TransferMonster from '../hooks/transfer-monster'
 import RetrieveMonsters from '../hooks/retrieve-monsters'
 import DeleteMonster from '../hooks/delete-monster'
 import Timer from '../helpers/timer'
-import { updateWinner, isWinner, updateTimeOfLatestDrop, getNewTimerValue, getRandomMonster } from '../hooks/update-game-status'
-
-const NFT_DROP_INTERVAL = 60
+import { updateWinner, isWinner, updateTimeOfLatestDrop, getNewTimerValue, getRandomMonster, NEW_AWARD_INTERVAL } from '../hooks/update-game-status'
 
 
 export default function Profile(props){
@@ -73,15 +71,15 @@ export default function Profile(props){
 
                 setTransferStatus(null)
             }else{
-                const newTimerValue = await getNewTimerValue( props.username, NFT_DROP_INTERVAL )
-                if( newTimerValue !== NFT_DROP_INTERVAL ){
+                const newTimerValue = await getNewTimerValue( props.username, NEW_AWARD_INTERVAL )
+                if( newTimerValue !== NEW_AWARD_INTERVAL ){
                     setDropOnLogin(false)
                 }
                 setTimerCount( newTimerValue )  
                 setStartGame(true) 
             } 
         }else{
-            setTimerCount( NFT_DROP_INTERVAL )
+            setTimerCount( NEW_AWARD_INTERVAL )
             setStartGame(true)
         }
     }, []);
@@ -96,7 +94,7 @@ export default function Profile(props){
             // In case user is an existing one and has just entered the game 
             if(dropOnLogin){
                 console.log('1')
-                // Next NFT drop
+                // Next NFT award
                 var monsterID = currentMediaID
                 setCurrentMediaID(currentMediaID + 1)
                 setTransferStatus('Unlocking monster...')
@@ -236,7 +234,7 @@ export default function Profile(props){
     return (
         <>
             {winner &&
-                <section className="section-nft-drop">
+                <section className="section-nft-award">
                     {transferStatus
                         ? <h4>Unlocking King Monster..</h4>
                         : <h4>Congrats, You Won King Monster! 👑</h4>
@@ -252,7 +250,7 @@ export default function Profile(props){
             {startGame && !winner &&
                 <>
                     {newMonster &&
-                        <section className="section-nft-drop">
+                        <section className="section-nft-award">
                             {transferStatus
                                 ? <h4>Unlocking today's Monster..</h4>
                                 : <h4>New Monster Unlocked 🎉</h4>
