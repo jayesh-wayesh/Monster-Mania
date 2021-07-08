@@ -24,7 +24,11 @@ Monster Mania is a collection game in which one can win a random Monster NFT dai
 - nodemon server
 - go to localhost:5000
 
-> NOTE: We are using MongoDB Atlas for hosting my mongoDB database.
+---
+## Note for backend
+
+- Please copy `.env.default` to `.env` and make appropriate changes.
+- We are using MongoDB Atlas for hosting mongoDB database.
 
 <br/>
 
