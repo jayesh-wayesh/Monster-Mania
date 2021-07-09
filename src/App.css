@@ -177,3 +177,7 @@ p{
 .icon{
     align-self: 'center';
 }
+
+.form-input{
+    margin: 20px;
+}
