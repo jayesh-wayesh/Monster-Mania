@@ -24,6 +24,7 @@ export const getImage = (monsterID) => {
         case 9: return monster9Image;
         case 10: return monster10Image;
         case 11: return monster11Image;
+        default: return null;
     }
 }
 
@@ -41,6 +42,7 @@ export const getName = (monsterID) => {
         case 9: return "Sawft Ball";
         case 10: return "Hippie Puns";
         case 11: return "King Cyborg";
+        default: return "Not Found";
     }
 }
 
@@ -58,5 +60,6 @@ export const getEmoji = (monsterID) => {
         case 9: return <>9️⃣</>;
         case 10: return <>🔟</>;
         case 11: return <>👑</>;
+        default: return <>⚠️</>;
     }
 }

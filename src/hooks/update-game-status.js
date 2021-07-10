@@ -16,11 +16,10 @@ export const updateTimeOfLatestDrop = async (username) => {
 
     await axios.put('http://localhost:5000/users/' + username + '/timerdetails', req)
         .then(res => {console.log(res)})
-
 }
 
 // Get time left in next award for old user
-export const getNewTimerValue = async (username, NEW_AWARD_INTERVAL) => {
+export const getNewTimerValue = async (username) => {
 
     var today = new Date()
     var todaysDateInNumber = Number((today.getFullYear() * 10000) + (today.getMonth() + 1) * 100 + today.getDate())

@@ -5,11 +5,7 @@ import { NEW_AWARD_INTERVAL } from "../hooks/update-game-status"
 export default function Timer(props) {
 
     const [t, setT] = useState({});
-    const [count, setCount] = useState();
-
-    useEffect(() => {
-      setCount( props.timerCount )
-    }, []);
+    const [count, setCount] = useState(props.timerCount);
 
     const convertSecondsToTime = (secs) => {
         let hours = Math.floor(secs / (60 * 60));
@@ -52,7 +48,6 @@ export default function Timer(props) {
             setT(secondsToTime);
              
             console.log('inside timer')
-
             if (count === 0) {
                props.setDelay(null);
                setCount(NEW_AWARD_INTERVAL)
@@ -62,7 +57,7 @@ export default function Timer(props) {
     return (
         <section className="section-dark">
 			<h2>Time Left until Next Award</h2>
-			{t
+			{t.s
 				? <h1>{t.h}:{t.m}:{t.s}</h1>
 				: <h1>00:00:00</h1>
 			}
@@ -85,7 +80,6 @@ function useInterval(callback, delay) {
 		}
 		if (delay !== null && delay !== undefined) {
 			let id = setInterval(tick, delay);
-			console.log(id);
 			return () => clearInterval(id);
 		}
 	}, [delay]);

@@ -30,7 +30,7 @@ async function getUserJwt(username){
 // Use blockCo api to get new jwt token
 async function refreshToken(username) {
   
-    var passcode = getPasscode(username)
+    var passcode = await getPasscode(username)
     const response = await blockCoApi.refreshToken(username, passcode)
     if(response.statusCode === 201){
         await updateUserJwt(username, response.body.jwt)

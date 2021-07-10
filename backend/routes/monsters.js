@@ -113,7 +113,6 @@ router.route('/transfer').put(async (req, res) => {
                 .catch(err => res.json('Error: ' + err))
         })
 
-
     var senderJwt = await Token.getUserJwt(sender)
     const nft_ids = [monsterToBeTransferred.nft_id]
 

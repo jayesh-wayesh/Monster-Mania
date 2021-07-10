@@ -7,7 +7,6 @@ const logout = () => {
     window.location = '/';
 }
 
-
 export default function Account(props) {
 
     useEffect(() => {
@@ -16,8 +15,7 @@ export default function Account(props) {
             props.setUsername(currentUser)
             props.setOldUser(true)
         }
-    }, []);
-
+    },[]);  // eslint-disable-line
 
     return (
         <>

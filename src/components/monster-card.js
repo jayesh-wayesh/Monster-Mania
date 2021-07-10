@@ -12,8 +12,8 @@ export default function MonsterCard(props) {
     return (
 		<Card className="card">
 			{(props.monsterProps && props.monsterProps.imageUrl)
-				? <img className="media" src={props.monsterProps.imageUrl} />
-				: <img className="media_locked" src={ getImage(props.currentMonster) } />
+				? <img className="media" alt="monster media" src={props.monsterProps.imageUrl} />
+				: <img className="media_locked" alt="monster media" src={ getImage(props.currentMonster) } />
 			}
 			<CardContent>
 				<Typography variant="body2" color="textPrimary" component="p">
@@ -32,7 +32,7 @@ export default function MonsterCard(props) {
 			{(props.monsterProps && (props.monsterProps.edition)) 
 				?
 				    <>
-					{(props.currentMonster == 11) &&
+					{(props.currentMonster === 11) &&
 						<Avatar aria-label="recipe" className="avatar">
 							{getEmoji(props.currentMonster)}
 						</Avatar>

@@ -34,7 +34,6 @@ export default function CreateUser(props) {
             .then(async (authenticate) => {
 
                 console.log('authenticate : ', authenticate)
-
                 if(authenticate === false){
                     alert('⚠️ Password Incorrect')
                 }else{
@@ -48,6 +47,7 @@ export default function CreateUser(props) {
                     }
                     props.setUsername(username)
                     localStorage.setItem("username", username)
+                    console.log('username : ', username)
                 }
             })
             .catch(err => console.log('⚠️ Error : ' + err))
