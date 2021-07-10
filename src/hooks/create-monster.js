@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
-import axios from 'axios';
-const monsterArray = [
-    "Select Monster",
+import React, { useState } from "react"
+import axios from 'axios'
+import Button from '@material-ui/core/Button'
+import TextField from '@material-ui/core/TextField'
+const monsterDropDown = [
     "Monster 1: Birdy Boss",
     "Monster 2: Casper Spray",
     "Monster 3: Hit Woman",
@@ -17,27 +18,23 @@ const monsterArray = [
 
 export default function CreateMonster() {
 
-    const inputRef = useRef(null);
-    const [monsterDropDown, setMonsterDropDown] = useState([])
-    const [monster, setMonster] = useState()
+    const [monsterID, setMonsterID] = useState(1)
+    const [monster, setMonster] = useState("Monster 1: Birdy Boss")
     const [editions, setEditions] = useState(0)
-
-    // initialzing monster list
-    useEffect(() => {    
-        setMonsterDropDown(monsterArray)
-    }, []);
+    const [mintingStatus, setMintingStatus] = useState()
         
     // current selected monster
     const onChangeMonster = (e) => {
         var selectedMonster = e.target.value
-        var monsterID 
+        setMonster(selectedMonster)
 
-        monsterArray.map((monsterName,index) => {
+        var monsterID 
+        monsterDropDown.forEach((monsterName,index) => {
             if(monsterName === selectedMonster){
-                monsterID = index
+                monsterID = index + 1
             }
         })
-        setMonster(monsterID)
+        setMonsterID(monsterID)
     }
 
     // update number of editions to be minted
@@ -46,52 +43,73 @@ export default function CreateMonster() {
     }
     
     const onSubmit = async (e) => {
-        e.preventDefault();
-        const newMonsters = {
-            last_nft_id: 280, // temp variable till demo app is not attached to api
-            editions: editions,
-            monsterID: monster,
-        }
+        e.preventDefault()
+        setMintingStatus('Minting...')
 
-        await axios.post('http://localhost:5000/monsters/create', newMonsters)
-            .then(res => console.log(res.data));
+        if(editions > 0){
+            const newMonsters = {
+                editions: editions,
+                monsterID: monsterID,
+            }
+    
+            console.log('newMonster : ', newMonsters)
+            await axios.post('http://localhost:5000/monsters/create', newMonsters)
+                .then(res => console.log(res.data));
+
+            setMintingStatus('✅ NFTs Minted')
+        }else{
+            alert('⚠️ Number of editions should be greater than 0')
+        }
     }
 
 
     return (
         <section className="section">
             <h3>Mint NFTs : </h3>
-            <form onSubmit={onSubmit}>
-                <div className="form-group"> 
-                    <label>Username: </label>
-                    <select ref={inputRef}
-                        required
-                        className="form-control"
+            <div><p>{mintingStatus}</p></div>
+            <form className="form-group" noValidate autoComplete="off">
+                <div className="form-input">
+                    <TextField
+                        id="outlined-select-currency-native"
+                        select
+                        label="Monster"
                         value={monster}
-                        onChange={onChangeMonster}>
-                        {
-							monsterDropDown.map(function(monster,index) {
-							return <option 
-								key={index}
-								value={monster}>{monster}
-								</option>;
-							})
-						}
-					</select>
-				</div>
-				<div className="form-group">
-					<label>Editions : </label>
-					<input 
-						type="text" 
-						className="form-control"
-						value={editions}
-						onChange={onChangeEditions}
-					/>
-				</div>
-				<div className="form-group">
-					<input type="submit" value="Mint NFTs" className="btn btn-primary" />
-				</div>
-			</form>
+                        onChange={onChangeMonster}
+                        SelectProps={{
+                            native: true,
+                        }}
+                        helperText="Please select monster to be minted"
+                        variant="outlined"
+                    >
+                    {monsterDropDown.map((option) => (
+                        <option key={option} value={option}>
+                        {option}
+                        </option>
+                    ))}
+                    </TextField>
+                </div>
+                <div className="form-input">
+                    <TextField 
+                        id="outlined-basic"
+                        label="Editions"
+                        variant="outlined"
+                        className="form-control"
+                        value={editions}
+                        onChange={onChangeEditions}
+                    />
+                </div>
+                <div>
+                    <Button 
+                        className="login" 
+                        type="submit" 
+                        size="small" 
+                        variant="outlined" 
+                        onClick={onSubmit}
+                    >
+                        Mint NFTs
+                    </Button>
+                </div>
+            </form>
 		</section>
     )
 }
