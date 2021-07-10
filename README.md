@@ -20,7 +20,7 @@ Monster Mania is a collection game in which one can win a random Monster NFT dai
     - yarn 
     - yarn start
     - go to localhost:3000
-6. Follow the steps given in [Minting monsters](https://github.com/blockcolabs/monster-mania/tree/dev#prerequisites) section to mint the monsters to play the game.
+6. Follow the steps given in [Minting monsters](https://github.com/blockcolabs/monster-mania/tree/dev#minting-monsters) section to mint the monsters to play the game.
 7. Sign up using a new username and start playing.
 
 <br/>
