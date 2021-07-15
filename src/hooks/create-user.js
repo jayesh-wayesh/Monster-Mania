@@ -55,7 +55,7 @@ export default function CreateUser(props) {
 
     return (
         <section className="section">
-            <h2>Sign up: </h2>
+            <h2>Sign Up or Log In :</h2>
             <form className="form-group" noValidate autoComplete="off">
                 <div className="form-input">
                     <TextField 
