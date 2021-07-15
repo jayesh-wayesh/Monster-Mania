@@ -1,7 +1,14 @@
+/***
+ * 
+ *   🔊 NOTE :
+ *   For the simplification of demo app, most requests from the frontend to the backend don’t require authentication.
+ *   
+ */
+
 const router = require('express').Router()
 const User = require('../models/user.model')
-const blockCoApi = require('../blockco/api_calls')
-const Token = require('../helpers/token')
+const blockCoApi = require('../blockco/api-calls')
+const func = require('../helpers/helper-functions')
 
 
 // Return all users
@@ -23,8 +30,8 @@ router.route('/').get((req, res) => {
 router.route('/add').post(async (req, res) => {
    
     const newAccountUsername = req.body.username
-    const newAccountPassword = req.body.password
-    const newAccountPasscode = Token.createPasscode()
+    const newAccountPassword = await func.generateHash(req.body.password)
+    const newAccountPasscode = func.createPasscode()
   
     // Create a new account on blockchain using username and passcode
     const response = await blockCoApi.createAccount(newAccountUsername, newAccountPasscode)
@@ -55,9 +62,11 @@ router.route('/:username/authenticate').put(async (req, res) => {
 
     var username = req.params.username
     var password = req.body.password
-    User.findOne({account_id: username})
-        .then(user => {
-            if(user.password == password){
+    await User.findOne({account_id: username})
+        .then(async (user) => {
+            
+            const match = await func.checkUserPassword(password, user.password)
+            if(match){
                 res.json({authenticate: true})
             }else{
                 res.json({authenticate: false})
@@ -123,7 +132,7 @@ router.route('/:username/monsters').delete(async (req, res) => {
         })
 
     // Find the owner jwt
-    var ownerJwt =  await Token.getUserJwt(owner)
+    var ownerJwt =  await func.getUserJwt(owner)
 
     // Burn the nfts corresponding to nftIds
     var response = await blockCoApi.deleteNFTs(owner, nftIds, ownerJwt)
@@ -133,7 +142,7 @@ router.route('/:username/monsters').delete(async (req, res) => {
         console.log('Trying with new jwt..')
 
         // call refresh token
-        response = await Token.refreshToken(owner)
+        response = await func.refreshToken(owner)
         if(response.statusCode !== 201){
             return res.status(400).json({"Error": response})
         }

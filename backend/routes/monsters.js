@@ -1,8 +1,8 @@
 const router = require('express').Router()
 const Monster = require('../models/monster.model')
 const User = require('../models/user.model')
-const blockCoApi = require('../blockco/api_calls')
-const Token = require('../helpers/token')
+const blockCoApi = require('../blockco/api-calls')
+const func = require('../helpers/helper-functions')
 const DEVELOPER_ACCOUNT=process.env.DEVELOPER_ACCOUNT
 const monsterNames = ["Birdy Boss","Casper Spray","Hit Woman","Aqua Coach","Thunder Kid","Mad Sauce","Octo Crush","Shady Stick","Sawft Ball","Hippie Puns","King Cyborg"]
 
@@ -74,7 +74,6 @@ router.route('/create').post(async (req,res) => {
             }
         }
     }
-    console.log('newMonstersArray : ', newMonstersArray)
 
 
     // Update users database to add all new monsters 
@@ -113,7 +112,7 @@ router.route('/transfer').put(async (req, res) => {
                 .catch(err => res.json('Error: ' + err))
         })
 
-    var senderJwt = await Token.getUserJwt(sender)
+    var senderJwt = await func.getUserJwt(sender)
     const nft_ids = [monsterToBeTransferred.nft_id]
 
     // Transfer the nft having `nft_id` equal to above found monster from sender to recipient
@@ -124,7 +123,7 @@ router.route('/transfer').put(async (req, res) => {
         console.log('Trying with new Token')
 
         // call refresh token
-        response = await Token.refreshToken(sender)
+        response = await func.refreshToken(sender)
         if(response.statusCode !== 201){
             return res.json({"Error": response})
         }
