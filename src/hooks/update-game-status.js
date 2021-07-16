@@ -3,7 +3,7 @@ import axios from 'axios';
 export const NEW_AWARD_INTERVAL = 60
 
 // Update time of the latest NFT award in database
-export const updateTimeOfLatestDrop = async (username) => {
+export const updateTimeOfLatestAward = async (username) => {
 
     var today = new Date()
     var dateInNumber = Number((today.getFullYear() * 10000) + (today.getMonth() + 1) * 100 + today.getDate())
@@ -25,17 +25,17 @@ export const getNewTimerValue = async (username) => {
     var todaysDateInNumber = Number((today.getFullYear() * 10000) + (today.getMonth() + 1) * 100 + today.getDate())
     var currentTimeInSecs = Number((today.getHours() * 3600) + (today.getMinutes() * 60) + today.getSeconds())
 
-    var dateOfLastNFTDrop
-    var timeOfLastNFTDropInSecs
+    var dateOfLastNFTAward
+    var timeOfLastNFTAwardInSecs
 
     await axios.get('http://localhost:5000/users/' + username + '/timerdetails')
         .then(res => {
-            dateOfLastNFTDrop = res.data.date
-            timeOfLastNFTDropInSecs = res.data.time
+            dateOfLastNFTAward = res.data.date
+            timeOfLastNFTAwardInSecs = res.data.time
     })
 
-    var differenceInDays = todaysDateInNumber - dateOfLastNFTDrop
-    var differenceInTime = currentTimeInSecs - timeOfLastNFTDropInSecs
+    var differenceInDays = todaysDateInNumber - dateOfLastNFTAward
+    var differenceInTime = currentTimeInSecs - timeOfLastNFTAwardInSecs
     var newTimerValue 
 
     if( differenceInDays > 0 ){

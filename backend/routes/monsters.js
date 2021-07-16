@@ -74,7 +74,7 @@ router.route('/create').post(async (req,res) => {
             }
         }
     }
-
+    console.log("Monsters added : ", newMonstersArray)
 
     // Update users database to add all new monsters 
     User.findOne({ account_id: DEVELOPER_ACCOUNT })

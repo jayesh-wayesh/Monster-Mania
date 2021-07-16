@@ -4,7 +4,7 @@ import TransferMonster from '../hooks/transfer-monster'
 import RetrieveMonsters from '../hooks/retrieve-monsters'
 import DeleteMonster from '../hooks/delete-monster'
 import Timer from '../helpers/timer'
-import { updateWinner, isWinner, updateTimeOfLatestDrop, getNewTimerValue, getRandomMonster, NEW_AWARD_INTERVAL } from '../hooks/update-game-status'
+import { updateWinner, isWinner, updateTimeOfLatestAward, getNewTimerValue, getRandomMonster, NEW_AWARD_INTERVAL } from '../hooks/update-game-status'
 
 
 export default function Game(props){
@@ -17,7 +17,7 @@ export default function Game(props){
     const [winner, setWinner] = useState(false)
     const [timerCount, setTimerCount] = useState()
     const [startGame, setStartGame] = useState(false)
-    const [dropOnLogin, setDropOnLogin] = useState(true)
+    const [transferAwardOnLogin, setTransferAwardOnLogin] = useState(true)
  
     // For testing we are using : current_monster  = current_monster + 1
     //     instead of using : current_monster  = random()
@@ -58,7 +58,7 @@ export default function Game(props){
                 }else{
                     const newTimerValue = await getNewTimerValue( props.username )
                     if( newTimerValue !== NEW_AWARD_INTERVAL ){
-                        setDropOnLogin(false)
+                        setTransferAwardOnLogin(false)
                     }
                     setTimerCount( newTimerValue )  
                     setStartGame(true) 
@@ -77,10 +77,25 @@ export default function Game(props){
             
             if(startGame && !delay && !winner){
 
-                var updatedMonsterCollection = []
+                var updatedMonsterCollection = monsterCollection
+
+                // In case current user is an old user, fetch user's monster collection from database 
+                if( props.oldUser ){
+                    updatedMonsterCollection = await RetrieveMonsters({ username: props.username })
+                    setMonsterCollection(updatedMonsterCollection)
+                    
+                    props.setOldUser(false)
+                    updateDisplay(updatedMonsterCollection)
+                }
     
-                // In case user is an existing one and has just entered the game 
-                if(dropOnLogin){
+                /**
+                 * 
+                 *  In case current user is a new user 
+                 *       OR
+                 *  In case current user is an old user and logins after `NEW_AWARD_INTERVAL` 
+                 * 
+                 */
+                if(transferAwardOnLogin){
                     // Next NFT award
                     var monsterID = currentMediaID
                     setCurrentMediaID(currentMediaID + 1)
@@ -88,20 +103,13 @@ export default function Game(props){
                     setNewMonster(monsterID)
         
                     // update monster collection for transferred monster
-                    updatedMonsterCollection = await TransferMonster({username: props.username, monsterID: monsterID, setCurrentMonster: setCurrentMonster, monsterCollection: monsterCollection })
+                    updatedMonsterCollection = await TransferMonster({username: props.username, monsterID: monsterID, setCurrentMonster: setCurrentMonster, monsterCollection: updatedMonsterCollection })
                     setMonsterCollection(updatedMonsterCollection)
     
                     // update database
-                    await updateTimeOfLatestDrop(props.username)
+                    await updateTimeOfLatestAward(props.username)
                 }else{
-                    setDropOnLogin(true)
-                }
-                
-                // In case user is an old one, we need to initialise monster collection array 
-                if( props.oldUser ){
-                    updatedMonsterCollection = await RetrieveMonsters({ username: props.username })
-                    setMonsterCollection(updatedMonsterCollection)
-                    props.setOldUser(false)
+                    setTransferAwardOnLogin(true)
                 }
     
                 // update UI
@@ -195,7 +203,7 @@ export default function Game(props){
             setWinner(true)
             
             // update database
-            await updateTimeOfLatestDrop( props.username )
+            await updateTimeOfLatestAward( props.username )
             await updateWinner( props.username )
         }
     }
