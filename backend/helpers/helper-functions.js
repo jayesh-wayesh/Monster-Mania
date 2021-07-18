@@ -3,6 +3,9 @@ const blockCoApi = require('../blockco/api-calls')
 const crypto = require('crypto')
 const bcrypt = require('bcrypt')
 const saltRounds = 10
+const DEVELOPER_ACCOUNT=process.env.DEVELOPER_ACCOUNT
+const INITIAL_BALANCE_DEVELOPER=10000
+const INITIAL_BALANCE_USER=1
 
 
 // Compare passwords for authentication
@@ -67,5 +70,14 @@ async function updateUserJwt(username, newJwt) {
         })
 } 
 
+function getInitialBalance(username){
 
-module.exports = { getUserJwt, refreshToken, updateUserJwt, getPasscode, createPasscode, generateHash, checkUserPassword };
+    var initialBalance = INITIAL_BALANCE_USER
+    if(username == DEVELOPER_ACCOUNT){
+        initialBalance = INITIAL_BALANCE_DEVELOPER
+    }
+
+    return initialBalance
+}
+
+module.exports = { getUserJwt, refreshToken, updateUserJwt, getPasscode, createPasscode, generateHash, checkUserPassword, getInitialBalance };

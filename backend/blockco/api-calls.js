@@ -10,12 +10,13 @@ const EXTERNAL_ID=process.env.EXTERNAL_ID
 
 
 // 🅱️ BlockCo's Create Account API 
-function createAccount(account_id, passcode){
+function createAccount(account_id, passcode, initial_balance){
    
     var data = {
         'developer_id': DEVELOPER_ID,     
         'account_id': account_id,            
-        'passcode': passcode,          
+        'passcode': passcode, 
+        'initial_balance': initial_balance      
     }
       
     var jwt = generateAccessToken()
@@ -29,6 +30,7 @@ function createAccount(account_id, passcode){
         }
     }
 
+    console.log('options: ', options)
     return new Promise((resolve, reject) => {
         request(options, (error, response) => {
             console.log('res : ', response)

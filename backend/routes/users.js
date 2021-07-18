@@ -34,9 +34,10 @@ router.route('/add').post(async (req, res) => {
     const newAccountUsername = req.body.username
     const newAccountPassword = await func.generateHash(req.body.password)
     const newAccountPasscode = func.createPasscode()
+    const newAccountBalance = func.getInitialBalance(newAccountUsername)
   
     // Create a new account on blockchain using username and passcode
-    const response = await blockCoApi.createAccount(newAccountUsername, newAccountPasscode)
+    const response = await blockCoApi.createAccount(newAccountUsername, newAccountPasscode, newAccountBalance)
     if(response.statusCode !== 201){
         return res.json({"Error": response})
     }
