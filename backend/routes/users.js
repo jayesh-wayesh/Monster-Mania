@@ -1,8 +1,10 @@
 /***
+ *  ------------------------------------------------------------------------------------------------------------------
  * 
  *   🔊 NOTE :
  *   For the simplification of demo app, most requests from the frontend to the backend don’t require authentication.
  *   
+ *  ------------------------------------------------------------------------------------------------------------------
  */
 
 const router = require('express').Router()
@@ -103,11 +105,14 @@ router.route('/:username/monsters').get(async (req, res) => {
     */
 
     /**
+     * ----------------------------------------------------------------------------------------------------------
+     * 
      *  🔊 NOTE : 
      *   Currently UI is configured according to output of `OPTION 1`
      *   In case you want to use `OPTION 2` then you'll need to make some changes in `hooks/retrieve-monsters.js`
+     * 
+     * ----------------------------------------------------------------------------------------------------------
      */
-
 });
 
 

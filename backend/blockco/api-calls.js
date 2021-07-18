@@ -6,7 +6,7 @@ var fs = require('fs')
 const BLOCKCO_API_URL=process.env.BLOCKCO_API_URL 
 const DEVELOPER_PRIVATE_KEY=process.env.DEVELOPER_PRIVATE_KEY
 const DEVELOPER_ID=Number(process.env.DEVELOPER_ID)
-const SERVER_NAME=process.env.SERVER_NAME
+const EXTERNAL_ID=process.env.EXTERNAL_ID
 
 
 // 🅱️ BlockCo's Create Account API 
@@ -31,6 +31,9 @@ function createAccount(account_id, passcode){
 
     return new Promise((resolve, reject) => {
         request(options, (error, response) => {
+            console.log('res : ', response)
+            console.log('error : ', error)
+
             resolve({
                 statusCode: response.statusCode, 
                 statusMessage: response.statusMessage,
@@ -212,7 +215,7 @@ function generateAccessToken() {
   
     var DeveloperClaims = {
       'exp': Date.now() + 15000,
-      'iss': SERVER_NAME,
+      'iss': EXTERNAL_ID,
       'developer_id': DEVELOPER_ID,
     }
   
