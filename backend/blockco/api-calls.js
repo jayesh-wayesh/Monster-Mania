@@ -30,12 +30,8 @@ function createAccount(account_id, passcode, initial_balance){
         }
     }
 
-    console.log('options: ', options)
     return new Promise((resolve, reject) => {
         request(options, (error, response) => {
-            console.log('res : ', response)
-            console.log('error : ', error)
-
             resolve({
                 statusCode: response.statusCode, 
                 statusMessage: response.statusMessage,

@@ -17,7 +17,7 @@ export default function Game(props){
     const [winner, setWinner] = useState(false)
     const [timerCount, setTimerCount] = useState()
     const [startGame, setStartGame] = useState(false)
-    const [transferAwardOnLogin, setTransferAwardOnLogin] = useState(true)
+    const [transferAwardFlag, setTransferAwardFlag] = useState(true)
  
     // For testing we are using : current_monster  = current_monster + 1
     //     instead of using : current_monster  = random()
@@ -37,13 +37,17 @@ export default function Game(props){
         imageUrl: null
     })
 
+    const [retrieveCollectionOnLogin, setRetrieveCollectionOnLogin] = useState(true)
+
     useEffect(() => {
         async function checkWinnerFunc() {
+
             if(props.oldUser){
 
                 // Check if user is already a winner
                 const kingMonster = await isWinner( props.username )
                 if(kingMonster){
+
                     setTransferStatus('Loading monster...')
                     setWinner(true)
     
@@ -56,14 +60,16 @@ export default function Game(props){
     
                     setTransferStatus(null)
                 }else{
+
                     const newTimerValue = await getNewTimerValue( props.username )
                     if( newTimerValue !== NEW_AWARD_INTERVAL ){
-                        setTransferAwardOnLogin(false)
+                        setTransferAwardFlag(false)
                     }
                     setTimerCount( newTimerValue )  
                     setStartGame(true) 
                 } 
             }else{
+
                 setTimerCount( NEW_AWARD_INTERVAL )
                 setStartGame(true)
             }
@@ -80,11 +86,11 @@ export default function Game(props){
                 var updatedMonsterCollection = monsterCollection
 
                 // In case current user is an old user, fetch user's monster collection from database 
-                if( props.oldUser ){
+                if(retrieveCollectionOnLogin){
                     updatedMonsterCollection = await RetrieveMonsters({ username: props.username })
                     setMonsterCollection(updatedMonsterCollection)
-                    
-                    props.setOldUser(false)
+
+                    setRetrieveCollectionOnLogin(false)
                     updateDisplay(updatedMonsterCollection)
                 }
     
@@ -95,7 +101,7 @@ export default function Game(props){
                  *  In case current user is an old user and logins after `NEW_AWARD_INTERVAL` 
                  * 
                  */
-                if(transferAwardOnLogin){
+                if(transferAwardFlag){
                     // Next NFT award
                     var monsterID = currentMediaID
                     setCurrentMediaID(currentMediaID + 1)
@@ -109,7 +115,7 @@ export default function Game(props){
                     // update database
                     await updateTimeOfLatestAward(props.username)
                 }else{
-                    setTransferAwardOnLogin(true)
+                    setTransferAwardFlag(true)
                 }
     
                 // update UI
