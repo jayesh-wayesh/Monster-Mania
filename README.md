@@ -1,27 +1,52 @@
-# Monster Mania
+WIP!
 
-Monster Mania is a collection game in which one can win a random Monster NFT daily! There are a total of 10 different monsters. Goal is to collect all the 10 monsters. Once you have completed the collection, you'll win a <b>King Monster NFT</b> to rule the monster world.
-
-<img src="https://blush.design/api/download?shareUri=PscwxZOpVNvMn679&c=Skin_0%7Ef45675-0.0%7E0089fd-0.1%7Eacff00-0.2%7Ef45675-0.3%7Efd8800-0.4%7Ef45675-0.5%7E0089fd-0.6%7Effcf00-0.7%7E7c6bba-0.8%7E0099a3-0.9%7Eacff00-0.10%7E00d2dc-0.11%7Efd8800&w=800&h=800&fm=png" width="700">
+<img src="./banner.png" width="1200">
 
 <br/>
 
-## Steps to run it locally
+👋 Welcome! This demo app is created for [BlockCo Labs](https://www.blockcolabs.com/) NFT SaaS Platform. 
+- **Monster Mania** is a collection game that uses BlockCo APIs for following use cases -
+  - Account Creation
+  - Token Refresh
+  - NFT Creation
+  - NFT Retrieval
+  - NFT Transfer
+  - NFT Deletion
+- It's a full-stack app based on MERN stack.
 
-1. git clone [https://github.com/jayesh-wayesh/Monster_Mania.git](https://github.com/jayesh-wayesh/Monster_Mania.git)
-2. Set branch to `main`
-3. Make sure to complete steps given in [Prerequisites](https://github.com/blockcolabs/monster-mania/tree/dev#prerequisites)
-4. Start `Backend` using following steps - 
+<br/>
+
+## Game Description 
+
+Monster Mania is a collection game in which one can win a random Monster NFT daily! There are a total of 10 different monsters. Goal is to collect all the 10 monsters. Once you have completed the collection, you'll win a <b>King Monster NFT</b> to rule the monster world.
+
+
+<br/>
+
+## Getting Started
+
+ Steps to run it locally
+
+#### 1. Clone the project
+```
+git clone https://github.com/blockcolabs/monster-mania.git
+```
+
+#### 2. Complete the steps given in [Prerequisites](https://github.com/blockcolabs/monster-mania/tree/dev#prerequisites) to update `env` variables in frontend and backend.
+
+#### 3. Start Backend
+Use the following steps to 
+3. Start `Backend` using following steps - 
     - cd backend
     - yarn
     - nodemon server
     - go to localhost:5000
-5. Start `Frontend` using following steps -
+4. Start `Frontend` using following steps -
     - yarn 
     - yarn start
     - go to localhost:3000
-6. Follow the steps given in [Minting monsters](https://github.com/blockcolabs/monster-mania/tree/dev#minting-monsters) section to mint the monsters to play the game.
-7. Sign up using a new username and start playing.
+5. Follow the steps given in [Minting monsters](https://github.com/blockcolabs/monster-mania/tree/dev#minting-monsters) section to mint the monsters to play the game.
+6. Sign up using a new username and start playing.
 
 <br/>
 
