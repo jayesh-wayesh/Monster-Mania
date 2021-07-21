@@ -16,61 +16,106 @@ WIP!
 
 <br/>
 
-## Game Description 
+# BlockCo APIs Usage
 
-Monster Mania is a collection game in which one can win a random Monster NFT daily! There are a total of 10 different monsters. Goal is to collect all the 10 monsters. Once you have completed the collection, you'll win a <b>King Monster NFT</b> to rule the monster world.
+#### Just want to take a sneek peak on how to use use BlockCo APIs ?
+  - Account Creation API call example
+  - Token Refresh API call example
+  - NFT Creation API call example
+  - NFT Retrieval API call example
+  - NFT Transfer API call example
+  - NFT Deletion API call example
+
+#### Are you an explorer and want to run the whole app in local ?
+
+Follow the steps given here to run whole app in local.
+
+<br/>
+
+# Game 
+
+### Live Demo
+Checkout the live demo of Monster Mania app here.
+
+### Description
+
+Monster Mania is a collection game in which one can win a <b>random</b> Monster NFT daily! There are a total of 10 <b>unique</b> monsters.
+
+ Your goal is to collect all the 10 unique monster NFTs. Once you have completed the collection, you'll win a <b>King Monster NFT</b> to rule the monster world.
 
 
 <br/>
 
-## Getting Started
+# Getting Started
 
  Steps to run it locally
 
-#### 1. Clone the project
+### 1. Clone the project
 ```
 git clone https://github.com/blockcolabs/monster-mania.git
 ```
 
-#### 2. Complete the steps given in [Prerequisites](https://github.com/blockcolabs/monster-mania/tree/dev#prerequisites) to update `env` variables in frontend and backend.
+### 2. Update .env files
+Complete the steps given in [Prerequisites](https://github.com/blockcolabs/monster-mania/tree/dev#prerequisites) to update `env` files in frontend and backend of project.
 
-#### 3. Start Backend
-Use the following steps to 
-3. Start `Backend` using following steps - 
-    - cd backend
-    - yarn
-    - nodemon server
-    - go to localhost:5000
-4. Start `Frontend` using following steps -
-    - yarn 
-    - yarn start
-    - go to localhost:3000
-5. Follow the steps given in [Minting monsters](https://github.com/blockcolabs/monster-mania/tree/dev#minting-monsters) section to mint the monsters to play the game.
-6. Sign up using a new username and start playing.
+### 3. Start Backend
+  Use the following steps to start backend -
+  1. Change into backend folder
+      ```
+      cd backend
+      ```
+  2.  Install all the required dependencies
+      ```
+      yarn
+      ```
+  3.  Start the project 
+      ```
+      nodemon server
+      ```
+  4.  Go to `localhost:5000`
+
+### 4. Start Frontend
+  Open a new terminal and enter following steps to start frontend -
+  1. Install all the dependencies
+      ```
+      yarn
+      ```
+  2. Start the project 
+      ```
+      yarn start
+      ```
+  3. Go to `localhost:3000`
+
+### 5. Mint Monsters
+Follow the steps given in [Minting monsters](https://github.com/blockcolabs/monster-mania/tree/dev#minting-monsters) section to mint the monsters to play the game.
+
+### 6. Enjoy playing Monster Mania! 
+Sign up using a new username and start playing.
 
 <br/>
 
-## Prerequisites 
+# Prerequisites 
+Complete the prerequisites for each of the following parts before trying this app in local.
 
-#### ⭐ Backend
-- Copy the content of `.env.default` file to a new `.env` and update the required environment variable(s). Note the following points before updating env variables :
-    - We are hosting are database using MongoDB Atlas. So, you'll need to create a new account in MongoDB Atlas and update the `ATLAS_URI` obtained in backend's .env file.
-    - `ENCRYPTION_SECRET` is required by mongoose-encryption to encrypt passcode and password
-    - `DEVELOPER_ACCOUNT` is basically the developer username. You can choose any username. Same can be used in .env file of frontend.
+### 1. BlockCo APIs
 
-#### ⭐ Frontend
-- Copy the content of `.env.default` file to a new `.env` file and update the required environment variable(s).
+  In order to run this demo app in your local, you need to obtain developer credentials. Please contact BlockCo Labs team to obtain test developer credentials.
 
-#### ⭐ BlockCo APIs
-- You'll need to request a private key to use BlockCo APIs. You can request key by making a call to 
-```
-curl -X POST -H "Content-Type: application/json" -d '{"subscription": "FREE"}'  <BLOCKCO_API_URL>/api/v1/developers
-```
-In response you'll get `private_key` and `id` that you'll need to use in .env file present in backend for DEVELOPER_PRIVATE_KEY and DEVELOPER_ID respectively
+### 2. Backend
+Copy the content of `.env.default` file to a new `.env` and update the required environment variable(s). Note the following points before updating env variables :
+  - We are hosting our database using [MongoDB Atlas](https://www.mongodb.com/cloud/atlas). You can create a new test account in MongoDB Atlas and update the `ATLAS_URI` obtained in backend's .env file.
+  - `ENCRYPTION_SECRET` is required by mongoose-encryption to encrypt passcode and password
+  - `DEVELOPER_PRIVATE_KEY`, `DEVELOPER_ID` and `EXTERNAL_ID` will be provided by BlockCo team as part of your developer credentials
+  - `DEVELOPER_ACCOUNT` is basically the developer username. You can choose any username. Same can be used in .env file of frontend.
+
+### 3. Frontend
+Copy the content of `.env.default` file to a new `.env` file and update the required environment variable(s).
+  - `REACT_APP_DEVELOPER_ACCOUNT` is same as `DEVELOPER_ACCOUNT` used in `backend/.env`.
+
 
 <br/>
 
-## Minting Monsters
+# Minting Monster NFTs
 
 In order to mint monsters, you'll need to sign up as admin. Use same username as `DEVELOPER_ACCOUNT` and enter a suitable password. It'll open a page for you where you can select the monster and number of editions to be minted for that monster. All the monsters will be minted to blockchain account corresponding to `DEVELOPER_ACCOUNT`. After you've minted enough NFTs you can logout and then login back as a new user.
 ```
@@ -79,7 +124,7 @@ In order to mint monsters, you'll need to sign up as admin. Use same username as
 
 <br/>
 
-## References
+# Acknowledgement
 
-#### Monster Images
+### Monster Images
 We are using Blush Design's [Street Life](https://blush.design/collections/2q77tcQgOR3gUha4oprc/street-life) Collection by [YONG](https://blush.design/artists/YONG).
