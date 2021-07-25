@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-export const NEW_AWARD_INTERVAL = 60
+// NEW_AWARD_INTERVAL = 1 day
+export const NEW_AWARD_INTERVAL = 86400
 
 // Update time of the latest NFT award in database
 export const updateTimeOfLatestAward = async (username) => {
@@ -15,7 +16,7 @@ export const updateTimeOfLatestAward = async (username) => {
     }
 
     await axios.put('http://localhost:5000/users/' + username + '/timerdetails', req)
-        .then(res => {console.log(res)})
+        // .then(res => {console.log(res)})
 }
 
 // Get time left in next award for old user
