@@ -47,7 +47,7 @@ export default function Timer(props) {
             var secondsToTime = convertSecondsToTime(count);
             setT(secondsToTime);
              
-            console.log('inside timer')
+            // console.log('inside timer')
             if (count === 0) {
                props.setDelay(null);
                setCount(NEW_AWARD_INTERVAL)
