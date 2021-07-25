@@ -11,6 +11,7 @@ const router = require('express').Router()
 const User = require('../models/user.model')
 const blockCoApi = require('../blockco/api-calls')
 const func = require('../helpers/helper-functions')
+const DEVELOPER_ACCOUNT=process.env.DEVELOPER_ACCOUNT
 
 
 // Return all users
@@ -20,7 +21,9 @@ router.route('/').get((req, res) => {
         .then(users => {
             var usersList = []
             users.forEach(user => { 
-                usersList.push( user.account_id ) 
+                if(user.account_id !== DEVELOPER_ACCOUNT){
+                    usersList.push( user.account_id ) 
+                }
             }) 
             return res.json(usersList)
         })
