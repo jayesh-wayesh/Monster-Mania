@@ -18,11 +18,7 @@ export default function Game(props){
     const [timerCount, setTimerCount] = useState()
     const [startGame, setStartGame] = useState(false)
     const [transferAwardFlag, setTransferAwardFlag] = useState(true)
- 
-    // For testing we are using : current_monster  = current_monster + 1
-    //     instead of using : current_monster  = random()
-    const [currentMediaID, setCurrentMediaID] = useState(1)
-
+    const [retrieveCollectionOnLogin, setRetrieveCollectionOnLogin] = useState(true)
     const [monsterCollection, setMonsterCollection]  = useState(
         new Array(12).fill({
             name: null, 
@@ -30,14 +26,12 @@ export default function Game(props){
             imageUrl: null
         })
     )
-
     const [currentMonster, setCurrentMonster] = useState({
         name: null, 
         edition: 0, 
         imageUrl: null
     })
 
-    const [retrieveCollectionOnLogin, setRetrieveCollectionOnLogin] = useState(true)
 
     useEffect(() => {
         async function checkWinnerFunc() {
@@ -103,8 +97,7 @@ export default function Game(props){
                  */
                 if(transferAwardFlag){
                     // Next NFT award
-                    var monsterID = currentMediaID
-                    setCurrentMediaID(currentMediaID + 1)
+                    var monsterID = getRandomMonster()
                     setTransferStatus('Unlocking monster...')
                     setNewMonster(monsterID)
         
