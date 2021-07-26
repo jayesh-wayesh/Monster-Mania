@@ -4,12 +4,12 @@
 
 👋 Welcome! This demo app is created for [BlockCo Labs](https://www.blockcolabs.com/) NFT SaaS Platform. 
 - **Monster Mania** is a collection game that uses BlockCo APIs for following use cases -
-  - Account Creation ([see example](https://github.com/blockcolabs/monster-mania/blob/cff856be8e9e0713d2e6ab6054138adc11d2cd3f/backend/blockco/api_calls.js#L13))
-  - Token Refresh ([see example](https://github.com/blockcolabs/monster-mania/blob/cff856be8e9e0713d2e6ab6054138adc11d2cd3f/backend/blockco/api_calls.js#L179))
-  - NFT Creation ([see example](https://github.com/blockcolabs/monster-mania/blob/cff856be8e9e0713d2e6ab6054138adc11d2cd3f/backend/blockco/api_calls.js#L45))
-  - NFT Retrieval ([see example](https://github.com/blockcolabs/monster-mania/blob/cff856be8e9e0713d2e6ab6054138adc11d2cd3f/backend/blockco/api_calls.js#L117))
-  - NFT Transfer ([see example](https://github.com/blockcolabs/monster-mania/blob/cff856be8e9e0713d2e6ab6054138adc11d2cd3f/backend/blockco/api_calls.js#L85))
-  - NFT Deletion ([see example](https://github.com/blockcolabs/monster-mania/blob/cff856be8e9e0713d2e6ab6054138adc11d2cd3f/backend/blockco/api_calls.js#L148))
+  - Account Creation ([see example](https://github.com/blockcolabs/monster-mania/blob/bd7c9f18c0cb8036e6ef8782d0d623eb6d8906b5/backend/blockco/api-calls.js#L13))
+  - NFT Creation ([see example](https://github.com/blockcolabs/monster-mania/blob/bd7c9f18c0cb8036e6ef8782d0d623eb6d8906b5/backend/blockco/api-calls.js#L46))
+  - NFT Retrieval ([see example](https://github.com/blockcolabs/monster-mania/blob/bd7c9f18c0cb8036e6ef8782d0d623eb6d8906b5/backend/blockco/api-calls.js#L118))
+  - NFT Transfer ([see example](https://github.com/blockcolabs/monster-mania/blob/bd7c9f18c0cb8036e6ef8782d0d623eb6d8906b5/backend/blockco/api-calls.js#L86))
+  - NFT Deletion ([see example](https://github.com/blockcolabs/monster-mania/blob/bd7c9f18c0cb8036e6ef8782d0d623eb6d8906b5/backend/blockco/api-calls.js#L149))
+  - Token Refresh ([see example](https://github.com/blockcolabs/monster-mania/blob/bd7c9f18c0cb8036e6ef8782d0d623eb6d8906b5/backend/blockco/api-calls.js#L180))
 - It's a full-stack app based on MERN stack.
 
 <br/>
@@ -33,7 +33,7 @@ git clone https://github.com/blockcolabs/monster-mania.git
 ```
 
 ### 2. Update .env files
-Complete the steps given in [Prerequisites](https://github.com/blockcolabs/monster-mania/tree/dev#prerequisites) to update `env` files in frontend and backend of project.
+Complete the steps given in [Prerequisites](https://github.com/blockcolabs/monster-mania#-prerequisites) to update `env` files in frontend and backend of project.
 
 ### 3. Start Backend
   Use the following steps to start backend -
@@ -64,7 +64,7 @@ Complete the steps given in [Prerequisites](https://github.com/blockcolabs/monst
   3. Go to `localhost:3000`
 
 ### 5. Mint Monsters
-Follow the steps given in [Minting monsters](https://github.com/blockcolabs/monster-mania/tree/dev#minting-monsters) section to mint the monsters to play the game.
+Follow the steps given in [Minting monsters](https://github.com/blockcolabs/monster-mania#-minting-monster-nfts) section to mint the monsters to play the game.
 
 ### 6. Enjoy playing Monster Mania! 
 Sign up using a new username and start playing.
@@ -79,7 +79,7 @@ Complete the prerequisites for each of the following parts before trying this ap
   In order to run this demo app in your local, you need to obtain developer credentials. Please contact BlockCo Labs team to obtain test developer credentials.
 
 ### 2. Backend
-Copy the content of `.env.default` file to a new `.env` and update the required environment variable(s). Note the following points before updating env variables :
+Inside backend directory, copy the content of `.env.default` file to a new `.env` and update the required environment variable(s). Note the following points before updating env variables :
   - We are hosting our database using [MongoDB Atlas](https://www.mongodb.com/cloud/atlas). You can create a new test account in MongoDB Atlas and update the `ATLAS_URI` obtained in backend's .env file.
   - `ENCRYPTION_SECRET` is required by mongoose-encryption to encrypt passcode.
   - `DEVELOPER_PRIVATE_KEY`, `DEVELOPER_ID` and `EXTERNAL_ID` will be provided by BlockCo team as part of your developer credentials.
