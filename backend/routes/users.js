@@ -1,7 +1,17 @@
+/***
+ *  ------------------------------------------------------------------------------------------------------------------
+ * 
+ *   🔊 NOTE :
+ *   For the simplification of demo app, most requests from the frontend to the backend don’t require authentication.
+ *   
+ *  ------------------------------------------------------------------------------------------------------------------
+ */
+
 const router = require('express').Router()
 const User = require('../models/user.model')
-const blockCoApi = require('../blockco/api_calls')
-const Token = require('../helpers/token')
+const blockCoApi = require('../blockco/api-calls')
+const func = require('../helpers/helper-functions')
+const DEVELOPER_ACCOUNT=process.env.DEVELOPER_ACCOUNT
 
 
 // Return all users
@@ -11,7 +21,9 @@ router.route('/').get((req, res) => {
         .then(users => {
             var usersList = []
             users.forEach(user => { 
-                usersList.push( user.account_id ) 
+                if(user.account_id !== DEVELOPER_ACCOUNT){
+                    usersList.push( user.account_id ) 
+                }
             }) 
             return res.json(usersList)
         })
@@ -23,10 +35,12 @@ router.route('/').get((req, res) => {
 router.route('/add').post(async (req, res) => {
    
     const newAccountUsername = req.body.username
-    var newAccountPasscode = Token.getPasscode(newAccountUsername)
+    const newAccountPassword = await func.generateHash(req.body.password)
+    const newAccountPasscode = func.createPasscode()
+    const newAccountBalance = func.getInitialBalance(newAccountUsername)
   
     // Create a new account on blockchain using username and passcode
-    const response = await blockCoApi.createAccount(newAccountUsername, newAccountPasscode)
+    const response = await blockCoApi.createAccount(newAccountUsername, newAccountPasscode, newAccountBalance)
     if(response.statusCode !== 201){
         return res.json({"Error": response})
     }
@@ -35,6 +49,7 @@ router.route('/add').post(async (req, res) => {
     // Create a user object and update in database
     const newUser = new User({
         account_id: newAccountUsername,
+        password: newAccountPassword,
         passcode: newAccountPasscode,
         jwt: newAccount.jwt,   
         blockchain: newAccount.blockchain,
@@ -45,6 +60,25 @@ router.route('/add').post(async (req, res) => {
     await newUser.save()
         .then((user) => res.json('User ' + user.account_id + ' added!'))
         .catch(err => res.status(400).json('Error: ' + err))
+});
+
+
+// Authenticate current user
+router.route('/:username/authenticate').put(async (req, res) => {
+
+    var username = req.params.username
+    var password = req.body.password
+    await User.findOne({account_id: username})
+        .then(async (user) => {
+            
+            const match = await func.checkUserPassword(password, user.password)
+            if(match){
+                res.json({authenticate: true})
+            }else{
+                res.json({authenticate: false})
+            }
+        })
+        .catch(err => res.json({authenticate: undefined}));
 });
 
 
@@ -75,11 +109,14 @@ router.route('/:username/monsters').get(async (req, res) => {
     */
 
     /**
+     * ----------------------------------------------------------------------------------------------------------
+     * 
      *  🔊 NOTE : 
      *   Currently UI is configured according to output of `OPTION 1`
      *   In case you want to use `OPTION 2` then you'll need to make some changes in `hooks/retrieve-monsters.js`
+     * 
+     * ----------------------------------------------------------------------------------------------------------
      */
-
 });
 
 
@@ -104,7 +141,7 @@ router.route('/:username/monsters').delete(async (req, res) => {
         })
 
     // Find the owner jwt
-    var ownerJwt =  await Token.getUserJwt(owner)
+    var ownerJwt =  await func.getUserJwt(owner)
 
     // Burn the nfts corresponding to nftIds
     var response = await blockCoApi.deleteNFTs(owner, nftIds, ownerJwt)
@@ -114,7 +151,7 @@ router.route('/:username/monsters').delete(async (req, res) => {
         console.log('Trying with new jwt..')
 
         // call refresh token
-        response = await Token.refreshToken(owner)
+        response = await func.refreshToken(owner)
         if(response.statusCode !== 201){
             return res.status(400).json({"Error": response})
         }
@@ -169,24 +206,24 @@ router.route('/:username/winner').put((req, res) => {
 });
 
 
-// Get the time of last NFT drop
+// Get the time of last NFT award
 router.route('/:username/timerdetails').get((req, res) => {
 
     var username = req.params.username
     User.findOne({account_id: username})
-        .then(user => res.json(user.game_info.last_nft_drop))
+        .then(user => res.json(user.game_info.last_nft_award))
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
 
-// Set the time of latest NFT drop
+// Set the time of latest NFT award
 router.route('/:username/timerdetails').put((req, res) => {
 
     var username = req.params.username
     User.findOne({account_id: username})
         .then(user => {
-            user.game_info.last_nft_drop.date = req.body.date
-            user.game_info.last_nft_drop.time = req.body.time
+            user.game_info.last_nft_award.date = req.body.date
+            user.game_info.last_nft_award.time = req.body.time
             user.save()
         })
         .then(() =>  res.json('Game timer details updated for user ' + username))

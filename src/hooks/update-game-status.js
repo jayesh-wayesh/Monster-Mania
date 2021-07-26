@@ -1,7 +1,10 @@
 import axios from 'axios';
 
-// Update time of the latest NFT drop in database
-export const updateTimeOfLatestDrop = async (username) => {
+// NEW_AWARD_INTERVAL = 1 day
+export const NEW_AWARD_INTERVAL = 86400
+
+// Update time of the latest NFT award in database
+export const updateTimeOfLatestAward = async (username) => {
 
     var today = new Date()
     var dateInNumber = Number((today.getFullYear() * 10000) + (today.getMonth() + 1) * 100 + today.getDate())
@@ -13,36 +16,35 @@ export const updateTimeOfLatestDrop = async (username) => {
     }
 
     await axios.put('http://localhost:5000/users/' + username + '/timerdetails', req)
-        .then(res => {console.log(res)})
-
+        // .then(res => {console.log(res)})
 }
 
-// Get time left in next Drop for old user
-export const getNewTimerValue = async (username, NFT_DROP_INTERVAL) => {
+// Get time left in next award for old user
+export const getNewTimerValue = async (username) => {
 
     var today = new Date()
     var todaysDateInNumber = Number((today.getFullYear() * 10000) + (today.getMonth() + 1) * 100 + today.getDate())
     var currentTimeInSecs = Number((today.getHours() * 3600) + (today.getMinutes() * 60) + today.getSeconds())
 
-    var dateOfLastNFTDrop
-    var timeOfLastNFTDropInSecs
+    var dateOfLastNFTAward
+    var timeOfLastNFTAwardInSecs
 
     await axios.get('http://localhost:5000/users/' + username + '/timerdetails')
         .then(res => {
-            dateOfLastNFTDrop = res.data.date
-            timeOfLastNFTDropInSecs = res.data.time
+            dateOfLastNFTAward = res.data.date
+            timeOfLastNFTAwardInSecs = res.data.time
     })
 
-    var differenceInDays = todaysDateInNumber - dateOfLastNFTDrop
-    var differenceInTime = currentTimeInSecs - timeOfLastNFTDropInSecs
+    var differenceInDays = todaysDateInNumber - dateOfLastNFTAward
+    var differenceInTime = currentTimeInSecs - timeOfLastNFTAwardInSecs
     var newTimerValue 
 
     if( differenceInDays > 0 ){
-        newTimerValue = NFT_DROP_INTERVAL
-    } else if( differenceInTime >= NFT_DROP_INTERVAL ){
-        newTimerValue = NFT_DROP_INTERVAL
+        newTimerValue = NEW_AWARD_INTERVAL
+    } else if( differenceInTime >= NEW_AWARD_INTERVAL ){
+        newTimerValue = NEW_AWARD_INTERVAL
     }else{
-        var secsLeft = NFT_DROP_INTERVAL - differenceInTime
+        var secsLeft = NEW_AWARD_INTERVAL - differenceInTime
         newTimerValue = secsLeft
     }
 

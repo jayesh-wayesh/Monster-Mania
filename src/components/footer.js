@@ -4,7 +4,7 @@ export default function Footer() {
     return (
 		<>
 			<br/>
-			<p className="footer">Demo app built for <span>SaaS API</span> project</p>
+			<p className="footer">Demo app built for <span><a href="https://www.blockcolabs.com/">BlockCo Labs</a></span> NFT SaaS Platform</p>
 		</>
     )
 }
