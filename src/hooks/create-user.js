@@ -8,7 +8,8 @@ export default function CreateUser(props) {
 
     const [accountUsername, setAccountUsername] = useState('')
     const [accountPassword, setAccountPassword] = useState('')
-        
+    const [accountCreationStatus, setAccountCreationStatus] = useState()
+    
     const onChangeUser = (e) => {
         setAccountUsername(e.target.value)
     }
@@ -39,8 +40,10 @@ export default function CreateUser(props) {
                 }else{
                     // Create new user
                     if(authenticate === undefined){
+                        setAccountCreationStatus('⌛ Creating new account on Flow...')
                         await axios.post('http://localhost:5000/users/add', newUser)
                             .then(res => console.log(res.data))
+                        setAccountCreationStatus('✅ Account created! ')
                     }else{
                         // old user
                         props.setOldUser(true)
@@ -56,6 +59,7 @@ export default function CreateUser(props) {
     return (
         <section className="section">
             <h2>Sign Up or Log In :</h2>
+            <div><p>{accountCreationStatus}</p></div>
             <form className="form-group" noValidate autoComplete="off">
                 <div className="form-input">
                     <TextField 
