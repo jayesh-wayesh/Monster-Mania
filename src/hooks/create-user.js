@@ -50,7 +50,7 @@ export default function CreateUser(props) {
                     }
                     props.setUsername(username)
                     localStorage.setItem("username", username)
-                    console.log('👋 New Account created for : ', username)
+                    console.log('👋 Hi ', username)
                     setAccountCreationStatus()
                 }
             })
