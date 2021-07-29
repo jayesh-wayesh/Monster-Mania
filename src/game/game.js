@@ -229,7 +229,7 @@ export default function Game(props){
                     {newMonster &&
                         <section className="section-nft-award">
                             {transferStatus
-                                ? <h4>Unlocking today's Monster..</h4>
+                                ? <h4>🔓 Unlocking today's Monster..</h4>
                                 : <h4>New Monster Unlocked 🎉</h4>
                             }
                             <div className="container">
