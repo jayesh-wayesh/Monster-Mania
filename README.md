@@ -89,7 +89,6 @@ Copy the content of `.env.default` file to a new `.env` and update the required 
 Copy the content of `.env.default` file to a new `.env` file and update the required environment variable(s).
   - `REACT_APP_DEVELOPER_ACCOUNT` is same as `DEVELOPER_ACCOUNT` used in `backend/.env`.
 
-
 <br/>
 
 ## 🧟 Minting Monster NFTs
