@@ -53,7 +53,7 @@ export default function CreateMonster() {
             }
     
             console.log('newMonster : ', newMonsters)
-            await axios.post('http://localhost:5000/monsters/create', newMonsters)
+            await axios.post(process.env.REACT_APP_BACKEND_URL + '/monsters/create', newMonsters)
                 .then(res => console.log(res.data));
 
             setMintingStatus('✅ NFTs Minted')

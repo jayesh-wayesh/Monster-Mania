@@ -10,7 +10,7 @@ export default async function TransferMonster(props){
     }
 
     var updatedMonsterCollection = props.monsterCollection  
-    await axios.put('http://localhost:5000/monsters/transfer', transaction)
+    await axios.put(process.env.REACT_APP_BACKEND_URL + '/monsters/transfer', transaction)
         .then(res => res.data)
         .then(monsterTransferred => {
 

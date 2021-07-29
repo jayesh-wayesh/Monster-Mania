@@ -10,7 +10,7 @@ export default async function RetrieveMonsters(props){
         imageUrl: null
     })
 
-    await axios.get('http://localhost:5000/users/' + props.username + '/monsters') 
+    await axios.get(process.env.REACT_APP_BACKEND_URL + '/users/' + props.username + '/monsters') 
         .then(res => res.data)
         .then(monsters => {
 

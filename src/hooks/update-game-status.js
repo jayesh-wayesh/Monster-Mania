@@ -15,7 +15,7 @@ export const updateTimeOfLatestAward = async (username) => {
         time: timeInSecs
     }
 
-    await axios.put('http://localhost:5000/users/' + username + '/timerdetails', req)
+    await axios.put(process.env.REACT_APP_BACKEND_URL + '/users/' + username + '/timerdetails', req)
         // .then(res => {console.log(res)})
 }
 
@@ -29,7 +29,7 @@ export const getNewTimerValue = async (username) => {
     var dateOfLastNFTAward
     var timeOfLastNFTAwardInSecs
 
-    await axios.get('http://localhost:5000/users/' + username + '/timerdetails')
+    await axios.get(process.env.REACT_APP_BACKEND_URL + '/users/' + username + '/timerdetails')
         .then(res => {
             dateOfLastNFTAward = res.data.date
             timeOfLastNFTAwardInSecs = res.data.time
@@ -54,14 +54,14 @@ export const getNewTimerValue = async (username) => {
 // Update winner in database
 export const updateWinner = async (username) => {
 
-    await axios.put('http://localhost:5000/users/' + username + '/winner')
+    await axios.put(process.env.REACT_APP_BACKEND_URL + '/users/' + username + '/winner')
         .then(res => {console.log(res)} )
 }
 
 // Check if current user is winner
 export const isWinner = async (username) => {
 
-    return await axios.get('http://localhost:5000/users/' + username + '/winner')
+    return await axios.get(process.env.REACT_APP_BACKEND_URL + '/users/' + username + '/winner')
         .then(res => res.data.kingMonster)
 }
 

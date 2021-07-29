@@ -27,7 +27,7 @@ export default function CreateUser(props) {
             password: accountPassword,
         }
 
-        await axios.put('http://localhost:5000/users/' + username + '/authenticate', {password: accountPassword})
+        await axios.put(process.env.REACT_APP_BACKEND_URL + '/users/' + username + '/authenticate', {password: accountPassword})
             .then(res => {  
                 var authenticate = res.data.authenticate
                 return authenticate
@@ -41,7 +41,7 @@ export default function CreateUser(props) {
                     // Create new user
                     if(authenticate === undefined){
                         setAccountCreationStatus('⌛ Creating your new account...')
-                        await axios.post('http://localhost:5000/users/add', newUser)
+                        await axios.post(process.env.REACT_APP_BACKEND_URL + '/users/add', newUser)
                             .then(res => console.log(res.data))
                         setAccountCreationStatus('✅ Account created! ')
                     }else{
