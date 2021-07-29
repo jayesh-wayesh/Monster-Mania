@@ -34,13 +34,13 @@ export default function CreateUser(props) {
             })
             .then(async (authenticate) => {
 
-                console.log('authenticate : ', authenticate)
+                // console.log('authenticate : ', authenticate)
                 if(authenticate === false){
                     alert('⚠️ Password Incorrect')
                 }else{
                     // Create new user
                     if(authenticate === undefined){
-                        setAccountCreationStatus('⌛ Creating new account on Flow...')
+                        setAccountCreationStatus('⌛ Creating your new account on Flow...')
                         await axios.post('http://localhost:5000/users/add', newUser)
                             .then(res => console.log(res.data))
                         setAccountCreationStatus('✅ Account created! ')
@@ -50,7 +50,7 @@ export default function CreateUser(props) {
                     }
                     props.setUsername(username)
                     localStorage.setItem("username", username)
-                    console.log('username : ', username)
+                    console.log('👋 New Account created for : ', username)
                     setAccountCreationStatus()
                 }
             })
@@ -62,7 +62,7 @@ export default function CreateUser(props) {
             {accountCreationStatus
                 ? 
                     <>            
-                        <h2>Hi, {accountUsername} 👋</h2>
+                        <h2>Hi {accountUsername} ! 👋</h2>
                         <div><p>{accountCreationStatus}</p></div>
                     </>
                 :  
