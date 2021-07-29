@@ -51,6 +51,7 @@ export default function CreateUser(props) {
                     props.setUsername(username)
                     localStorage.setItem("username", username)
                     console.log('username : ', username)
+                    setAccountCreationStatus()
                 }
             })
             .catch(err => console.log('⚠️ Error : ' + err))
@@ -58,41 +59,50 @@ export default function CreateUser(props) {
 
     return (
         <section className="section">
-            <h2>Sign Up or Log In :</h2>
-            <div><p>{accountCreationStatus}</p></div>
-            <form className="form-group" noValidate autoComplete="off">
-                <div className="form-input">
-                    <TextField 
-                        id="outlined-basic"
-                        label="Username"
-                        variant="outlined"
-                        className="form-control"
-                        value={accountUsername}
-                        onChange={onChangeUser}
-                    />
-                </div>
-                <div className="form-input"> 
-                    <TextField 
-                        id="outlined-basic"
-                        label="Password"
-                        variant="outlined"
-                        className="form-control"
-                        value={accountPassword}
-                        onChange={onChangePassword}
-                    />
-                </div>
-                <div>
-                    <Button 
-                        className="login" 
-                        type="submit" 
-                        size="small" 
-                        variant="outlined" 
-                        onClick={handleSubmit}
-                    >
-                        Start game
-                    </Button>
-                </div>
-			</form>
+            {accountCreationStatus
+                ? 
+                    <>            
+                        <h2>Hi, {accountUsername} 👋</h2>
+                        <div><p>{accountCreationStatus}</p></div>
+                    </>
+                :  
+                    <>
+                        <h2>Sign Up or Log In :</h2>
+                        <form className="form-group" noValidate autoComplete="off">
+                            <div className="form-input">
+                                <TextField 
+                                    id="outlined-basic"
+                                    label="Username"
+                                    variant="outlined"
+                                    className="form-control"
+                                    value={accountUsername}
+                                    onChange={onChangeUser}
+                                />
+                            </div>
+                            <div className="form-input"> 
+                                <TextField 
+                                    id="outlined-basic"
+                                    label="Password"
+                                    variant="outlined"
+                                    className="form-control"
+                                    value={accountPassword}
+                                    onChange={onChangePassword}
+                                />
+                            </div>
+                            <div>
+                                <Button 
+                                    className="login" 
+                                    type="submit" 
+                                    size="small" 
+                                    variant="outlined" 
+                                    onClick={handleSubmit}
+                                >
+                                    Start game
+                                </Button>
+                            </div>
+                        </form>
+                    </>
+            }
 		</section>
 	)
 }
