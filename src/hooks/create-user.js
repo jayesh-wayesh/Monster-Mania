@@ -8,7 +8,8 @@ export default function CreateUser(props) {
 
     const [accountUsername, setAccountUsername] = useState('')
     const [accountPassword, setAccountPassword] = useState('')
-        
+    const [accountCreationStatus, setAccountCreationStatus] = useState()
+    
     const onChangeUser = (e) => {
         setAccountUsername(e.target.value)
     }
@@ -33,21 +34,24 @@ export default function CreateUser(props) {
             })
             .then(async (authenticate) => {
 
-                console.log('authenticate : ', authenticate)
+                // console.log('authenticate : ', authenticate)
                 if(authenticate === false){
                     alert('⚠️ Password Incorrect')
                 }else{
                     // Create new user
                     if(authenticate === undefined){
+                        setAccountCreationStatus('⌛ Creating your new account...')
                         await axios.post('http://localhost:5000/users/add', newUser)
                             .then(res => console.log(res.data))
+                        setAccountCreationStatus('✅ Account created! ')
                     }else{
                         // old user
                         props.setOldUser(true)
                     }
                     props.setUsername(username)
                     localStorage.setItem("username", username)
-                    console.log('username : ', username)
+                    console.log('👋 Hi ', username)
+                    setAccountCreationStatus()
                 }
             })
             .catch(err => console.log('⚠️ Error : ' + err))
@@ -55,40 +59,50 @@ export default function CreateUser(props) {
 
     return (
         <section className="section">
-            <h2>Sign Up or Log In :</h2>
-            <form className="form-group" noValidate autoComplete="off">
-                <div className="form-input">
-                    <TextField 
-                        id="outlined-basic"
-                        label="Username"
-                        variant="outlined"
-                        className="form-control"
-                        value={accountUsername}
-                        onChange={onChangeUser}
-                    />
-                </div>
-                <div className="form-input"> 
-                    <TextField 
-                        id="outlined-basic"
-                        label="Password"
-                        variant="outlined"
-                        className="form-control"
-                        value={accountPassword}
-                        onChange={onChangePassword}
-                    />
-                </div>
-                <div>
-                    <Button 
-                        className="login" 
-                        type="submit" 
-                        size="small" 
-                        variant="outlined" 
-                        onClick={handleSubmit}
-                    >
-                        Start game
-                    </Button>
-                </div>
-			</form>
+            {accountCreationStatus
+                ? 
+                    <>            
+                        <h2>Hi {accountUsername} ! 👋</h2>
+                        <div><p>{accountCreationStatus}</p></div>
+                    </>
+                :  
+                    <>
+                        <h2>Sign Up or Log In :</h2>
+                        <form className="form-group" noValidate autoComplete="off">
+                            <div className="form-input">
+                                <TextField 
+                                    id="outlined-basic"
+                                    label="Username"
+                                    variant="outlined"
+                                    className="form-control"
+                                    value={accountUsername}
+                                    onChange={onChangeUser}
+                                />
+                            </div>
+                            <div className="form-input"> 
+                                <TextField 
+                                    id="outlined-basic"
+                                    label="Password"
+                                    variant="outlined"
+                                    className="form-control"
+                                    value={accountPassword}
+                                    onChange={onChangePassword}
+                                />
+                            </div>
+                            <div>
+                                <Button 
+                                    className="login" 
+                                    type="submit" 
+                                    size="small" 
+                                    variant="outlined" 
+                                    onClick={handleSubmit}
+                                >
+                                    Start game
+                                </Button>
+                            </div>
+                        </form>
+                    </>
+            }
 		</section>
 	)
 }
