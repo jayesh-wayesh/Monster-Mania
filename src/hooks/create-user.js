@@ -40,7 +40,7 @@ export default function CreateUser(props) {
                 }else{
                     // Create new user
                     if(authenticate === undefined){
-                        setAccountCreationStatus('⌛ Creating your new account on Flow...')
+                        setAccountCreationStatus('⌛ Creating your new account...')
                         await axios.post('http://localhost:5000/users/add', newUser)
                             .then(res => console.log(res.data))
                         setAccountCreationStatus('✅ Account created! ')
