@@ -27,7 +27,8 @@ function createAccount(account_id, passcode, initial_balance){
         headers: {
           'Authorization': 'Bearer ' + jwt,               // Developer’s JWT.
           'Content-Type': 'application/json'
-        }
+        },
+        rejectUnauthorized: false
     }
 
     return new Promise((resolve, reject) => {
@@ -67,7 +68,8 @@ function createNFTs(recipient_account_id, monster_props){
         headers: {
             'Authorization': 'Bearer ' + jwt,               // Developer’s JWT.
             'Content-Type': 'multipart/form-data; boundary=' + bound,
-        }
+        },
+        rejectUnauthorized: false
     }
 
     return new Promise((resolve, reject) => {
@@ -99,7 +101,8 @@ function transferNFT(sender_account_id, recipient_account_id, nft_ids, sender_jw
         headers: {
             'Authorization': 'Bearer ' + sender_jwt,               // sender's JWT.
             'Content-Type': 'application/json'
-        }
+        },
+        rejectUnauthorized: false
     }
 
     return new Promise((resolve, reject) => {
@@ -130,7 +133,8 @@ function retrieveNFT(owner_account_id){
         headers: {
             'Authorization': 'Bearer ' + jwt,               // developers's JWT.
             'Content-Type': 'application/json'
-        }
+        },
+        rejectUnauthorized: false
     }
 
     return new Promise((resolve, reject) => {
@@ -161,7 +165,8 @@ function deleteNFTs(owner_account_id, nft_ids, owner_jwt){
         headers: {
             'Authorization': 'Bearer ' + owner_jwt,               // sender's JWT.
             'Content-Type': 'application/json'
-        }
+        },
+        rejectUnauthorized: false
     }
 
     return new Promise((resolve, reject) => {
@@ -187,13 +192,14 @@ function refreshToken(account_id, passcode) {
     
     var jwt = generateAccessToken()
     var options = {
-      uri: BLOCKCO_API_URL + '/api/v1/tokens',
-      body: JSON.stringify(data),
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + jwt,               // Developer’s JWT.
-        'Content-Type': 'application/json'
-      }
+        uri: BLOCKCO_API_URL + '/api/v1/tokens',
+        body: JSON.stringify(data),
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + jwt,               // Developer’s JWT.
+            'Content-Type': 'application/json'
+        },
+        rejectUnauthorized: false
     }
 
     return new Promise((resolve, reject) => {
